@@ -1,0 +1,22 @@
+# Ignore build artifacts and temp files
+*.obj
+*.log
+*.tmp
+*.bak
+*.user
+*.cache
+*.pdb
+
+# Ignore Visual Studio folder
+.vs/
+*.suo
+*.sdf
+
+# Ignore OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Ignore IDE files
+.idea/
+*.iml
