@@ -1,181 +1,91 @@
-# TGOpti - Tech Gameplay Optimizer
+# TGO — Tech Gameplay Optimizer (TGO.bat)
 
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Windows](https://img.shields.io/badge/platform-Windows-blue.svg)](#%EF%B8%8F-requirements)
-[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/tehgeii/TGOpti/releases)
-[![.NET](https://img.shields.io/badge/.NET-Runtime%20Required-purple.svg)](#%EF%B8%8F-requirements)
-[![Issues](https://img.shields.io/github/issues/tehgeii/TGOpti.svg)](https://github.com/tehgeii/TGOpti/issues)
+TGO.bat (Tech Gameplay Optimizer) is a Windows batch script (Version 1.0) that provides a menu-driven set of system maintenance and optimization tasks intended to improve responsiveness and gaming performance. The script performs file cleanup, registry tweaks, service and power configuration, driver/IO priority adjustments, and other changes that can affect system behavior. Many operations require Administrator privileges and can modify system files, Windows services, and the registry. Use with caution and back up your system before applying changes.
 
-**TGOpti** (Tech Gameplay Optimizer) is a lightweight, open-source Windows optimizer designed to boost your system's performance with transparent, reversible tweaks. Speed up your PC, free up resources, and maintain full control over every optimization.
+## Important Warning
 
----
+- Always run TGO.bat as Administrator. The script attempts to relaunch itself with elevated privileges if it's not already elevated.
+- The script makes significant registry and service changes (disabling services, changing driver priorities, altering power settings, etc.). These changes can affect system stability and behavior.
+- Create a system restore point before applying optimizations. The script includes an option to create a restore point and attempts to bypass the 24-hour cooldown rule when creating one.
 
-## 🎯 Why TGOpti?
+## Menu (Version 1.0) — Overview of Options
 
-**Transparency First:** Unlike closed-source optimizers, every tweak in TGOpti is visible in plain batch scripts. No hidden changes, no mystery modifications.
+When launched, TGO.bat presents a menu with the following options:
 
-**Fully Reversible:** Don't like a change? Use the built-in System Restore feature or manually revert any tweak.
+0) System Restore
+- Create a system restore point (script uses PowerShell and attempts to bypass the default cooldown).
+- Open System Restore (launches rstrui.exe when available; otherwise opens System Protection settings).
 
-**Lightweight & Fast:** Small installation footprint (~5MB), no background services, no bloat.
+1) Clean All Temporary Files
+- Cleans Windows and user temp folders, selected system logs, thumbnail caches.
+- Stops Windows Update related services and recreates the SoftwareDistribution folder.
+- Clears Recycle Bin, runs Disk Cleanup (cleanmgr), and issues a TRIM/Optimize-Volume command for C:.
 
-**Safe & Tested:** All optimizations are carefully selected to improve performance without breaking system stability.
+2) Disk Optimization (choose HDD or SSD)
+- HDD Optimization:
+  - Adjusts per-device registry parameters (e.g., UserWriteCacheSetting, CacheIsPowerProtected).
+  - Applies fsutil/NTFS tweaks: memory usage, last access disabling, delete notify, paging file encryption, MFT zone, 8.3 name creation.
+  - Disables Prefetch/Prefetcher in the registry and disables SysMain (Superfetch) service.
+- SSD Optimization:
+  - Enables write-cache and power-protected cache flags where applicable.
+  - Writes registry entries to disable SSD/SD idle power states and sets large idle timeouts.
+  - Applies the same fsutil/NTFS tweaks as the HDD path.
 
-**For Everyone:** One-click setup for beginners, granular control for power users.
+3) Mouse and Keyboard Optimization
+- CPU-profiled presets (Low / Medium / High) and a Revert option.
+- Adjusts MouseDataQueueSize and KeyboardDataQueueSize.
+- Disables selective suspend and other device power features for PCI/USB devices.
+- Sets driver thread priorities for relevant drivers (e.g., usbxhci, USBHUB3, nvlddmkm, NDIS).
+- Tweaks csrss.exe I/O and CPU priority hints, accessibility flags, and user mouse/keyboard speed preferences.
+- Revert option attempts to restore defaults and remove applied registry keys.
 
----
+4) RAM Optimization
+- Quick presets (various MB options) and a Custom GB input mode (validated range).
+- Updates SvcHostSplitThresholdInKB (controls services split behavior) and LargeSystemCache.
+- For lower RAM sizes the script enables memory compression (MMAgent); for larger RAM sizes it disables memory compression and enables LargeSystemCache.
+- Revert option restores default RAM-related registry values.
 
-## 🚀 Features
+5) Startup Optimization
+- Downloads and launches Sysinternals Autoruns (if not already present) and instructs the user to review the Logon tab and uncheck unwanted startup entries. Requires manual interaction and care to avoid disabling required Windows components.
 
-### 🎮 Performance Optimization
-- **Startup Optimization** - Disables unnecessary startup programs
-- **Ram Optimization** - Frees up memory and clears standby lists
-- **Disk Optimization** - Defragments and optimizes drive performance
-- **Mouse & Keyboard Optimization** - Reduces input lag both mouse & keyboard for gaming
+6) Disable All Power Saving Features
+- Options include:
+  - All-in-One: disable hibernation, sleep timers, and device power saving.
+  - Disable Hibernation only (powercfg -h off).
+  - Disable Sleep only (set timeouts to 0).
+  - Disable device selective suspend (affects USB/LAN/Wi‑Fi).
+  - Revert: re-enable hibernation, restore reasonable timeouts and re-enable device power management.
+- Changes may require reboot to fully take effect.
 
-### 🧹 System Cleanup
-- **Clean All Temporary Files** - Removes Windows temp files, browser cache, and system junk
+7) Exit
+- Exits the script.
 
-### ⚡ Power & Efficiency
-- **Disable All Power Saving Features** - Maximizes performance by removing power throttling
-- **CPU Optimization** - *(Coming Soon)* Advanced CPU scheduling tweaks
-- **GPU Optimization** - *(Coming Soon)* Graphics performance enhancements
+## How to Use
 
-### 🛡️ System Control
-- **System Restore** - Create restore points and revert all changes
-- **Dark Mode Support** - Easy on the eyes interface
-- **Admin Privileges** - Ensures all optimizations can be properly applied
+1. Download or clone this repository to a Windows machine.
+2. Right-click TGO.bat and select "Run as administrator", or run it from an elevated Command Prompt. The script will attempt to relaunch elevated if needed.
+3. Use the on-screen menu to select the optimization you want to apply.
+4. Follow any on-screen instructions. Some tools (e.g., Autoruns) require manual interaction.
 
-*Full details of each feature available in the [`scripts`](./scripts) folder*
+## Safety & Reverting
 
----
+- The script includes revert flows for several areas (Mouse/Keyboard, RAM, Power settings) and provides a System Restore creation option.
+- Despite revert options, some registry changes may persist or require a reboot. If unsure, create a system restore point or export registry keys before applying changes.
 
-## 📸 Preview
+## Implementation Notes
 
-<img src="./assets/tgopti_screenshot.png" alt="TGOpti screenshot" width="75%" height="auto">
+- The script uses built-in Windows utilities (reg.exe, sc, net, fsutil, powercfg, cleanmgr, start, rstrui.exe) and PowerShell for specific tasks (file download and extraction, Clear-RecycleBin, Enable/Disable-MMAgent, Get-PnpDevice).
+- Designed for Windows desktop/gaming environments; not recommended for servers or mission-critical systems without testing.
 
-*Clean, simple interface with one-click optimizations*
+## Limitations
 
----
+- Some operations depend on the presence of specific system files or PowerShell cmdlets and may fail silently (the script suppresses much output and redirects errors to minimize clutter).
+- The script attempts to be cautious (offers reverts and restore point creation) but making changes to the registry and services always carries risk.
 
-## 📝 How to Use
+## License
 
-### 🚀 Quick Start (Recommended)
+No explicit license is included. Add a license file if you want to permit reuse.
 
-1. Download `TGOpti_Setup.exe` from the [latest release](https://github.com/tehgeii/TGOpti/releases)
-2. Right-click and **Run as Administrator**
-3. Click the optimizations you want to apply
-4. Restart your PC for changes to take effect
+## Support
 
-### ⚙️ Recommended Optimization Order
-
-1. **Create System Restore Point** *(Always do this first!)*
-2. **Clean All Temporary Files**
-3. **Startup Optimization**
-4. **Ram Optimization**
-5. **Disable All Power Saving Features**
-6. **Disk Optimization** *(Both for HDDs and SSDs)*
-7. **Mouse & Keyboard Optimization** *(For gamers)*
-
----
-
-## ⚙️ Requirements
-
-- **OS:** Windows 10 (1809 or later) or Windows 11
-- **Architecture:** 64-bit recommended (32-bit supported)
-- **.NET Runtime:** [Required](https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.9/windowsdesktop-runtime-9.0.9-win-x64.exe)
-- **Privileges:** Administrator access required
-- **Storage:** ~5MB installation space
-
----
-
-## 📊 Performance Improvements
-
-**Typical Results** *(Your mileage may vary)*
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Boot Time | 45s | 28s | **~38% faster** |
-| RAM Usage (Idle) | 4.2GB | 2.8GB | **~33% reduction** |
-| Disk Space Freed | - | 2-5GB | **Average cleanup** |
-| Input Latency | 12ms | 6ms | **~50% reduction** |
-| FPS Stability | Variable | Stable | **Fewer drops** |
-
-*Results based on average Windows 10/11 systems with default settings*
-
----
-
-## ❓ FAQ
-
-**Q: Is TGOpti safe to use?**  
-A: Yes! All scripts are open-source and transparent. We recommend reviewing them and creating a system restore point before applying optimizations.
-
-**Q: Will this void my warranty?**  
-A: No. TGOpti only modifies software settings, not hardware or firmware.
-
-**Q: Can I undo the changes?**  
-A: Absolutely! Use the built-in "System Restore" button or Windows' native System Restore feature to revert all changes.
-
-**Q: Do I need to run this regularly?**  
-A: No. Most optimizations are one-time tweaks. You may want to run "Clean Temporary Files" monthly for the best result.
-
-**Q: Will this break Windows Updates?**  
-A: No. TGOpti doesn't disable Windows Update or essential system services.
-
-**Q: Why do I need .NET Runtime?**  
-A: The GUI application is built with .NET for a modern, responsive interface. The batch scripts themselves don't require it.
-
-**Q: Does this work on laptops?**  
-A: Yes, but be cautious with "Disable All Power Saving Features" as it may reduce battery life.
-
-**Q: Can I use this on a gaming PC?**  
-A: Absolutely! TGOpti is optimized for gaming performance with reduced input lag and better frame stability.
-
----
-
-## 🛡️ Disclaimer & Security
-
-**Important:** TGOpti is provided "as-is" without warranty of any kind. While we've tested extensively, system configurations vary.
-
-### Before Using TGOpti:
-✅ **Create a system restore point** (built into the app)  
-✅ **[`Review the batch scripts`](./scripts)** if you're curious about what changes are made 
-
-### Security Notes:
-- All code is open-source and auditable
-- No telemetry or data collection
-- Requires admin rights only for system-level optimizations
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome!  
-If you have suggestions, improvements, or new tweaks, open an [issue](https://github.com/tehgeii/TGOpti/issues) or submit a pull request.
-
-For major changes, please open an issue first to discuss your ideas.
-
----
-
-## 💬 Support & Community
-
-- 📫 **Issues:** [Report bugs or problems](https://github.com/tehgeii/TGOpti/issues)
-- ⭐ **Star this repo** if you find it useful!
-- 🔔 **Watch** for updates and new releases
-
----
-
-<div align="center">
-
-**TGOpti – Make Windows faster and smooth!**
-
-[Download Latest Release](https://github.com/tehgeii/TGOpti/releases) | [Report Issue](https://github.com/tehgeii/TGOpti/issues)
-
-*Made with ❤️ for the Windows community*
-
-</div>
+If you want changes to the README text or want me to commit this file into the repository for you, tell me and I will proceed (or paste the contents above into a README.md in your repo).
