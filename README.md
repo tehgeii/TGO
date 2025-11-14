@@ -1,4 +1,4 @@
-# TGO — Tech Gameplay Optimizer (TGO.bat)
+# TGO — Tech Gameplay Optimizer
 
 TGO.bat is a small Windows batch tool (v1.0) that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
