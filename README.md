@@ -15,7 +15,7 @@ What the script can do (menu overview)
 - **RAM**: presets or custom input to set service split thresholds and memory compression. Has a revert option.
 - **Startup Optimization**: downloads and opens Sysinternals Autoruns so you can disable startup apps (manual step).
 - **Power Saving**: disable hibernate/sleep/device power saving or revert to defaults.
-- *Exit**: quit the script.
+- **Exit**: quit the script.
 
 How to run
 1. Get and download 'TGO.bat' from the [latest release](https://github.com/tehgeii/TGOpti/releases).
