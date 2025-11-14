@@ -1,6 +1,6 @@
 # TGO — Tech Gameplay Optimizer
 
-TGO.bat is a small Windows batch tool (v1.0) that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
+TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
 Quick facts
 - Run as Administrator (the script will try to relaunch itself with elevation if needed).
@@ -17,17 +17,14 @@ What the script can do (menu overview)
 - Power Saving: disable hibernate/sleep/device power saving or revert to defaults.
 - Exit: quit the script.
 
-How to download
-- Download TGO.bat from the Releases section (on the right side of this repo page) or clone the repository.
-
 How to run
-1. Get TGO.bat (Releases or clone).
-2. Right-click TGO.bat and choose "Run as administrator" (or run it from an elevated Command Prompt).
+1. Get and download TGO.bat from the Releases section.
+2. Right-click TGO.bat and choose "Run as administrator".
 3. Use the on-screen menu to pick an option and follow any prompts.
 
 Safety & revert
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
-- If unsure, create a restore point or back up the registry first.
+- If unsure, create a restore point first.
 
 Support
 - Open an issue in this repo if something goes wrong or if you want improvements.
