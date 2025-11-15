@@ -1,7 +1,7 @@
 # TGO - Tech Gameplay Optimizer
 
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Download)](https://github.com/tehgeii/TGO/releases)
-[![Version](https://img.shields.io/badge/Version-1.0-blue.svg)](https://github.com/tehgeii/TGOpti/releases)
+[![Version](https://img.shields.io/badge/Version-1.0-blue.svg)](https://github.com/tehgeii/TGO/releases)
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
