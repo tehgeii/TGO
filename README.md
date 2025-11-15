@@ -36,5 +36,8 @@ Before Using TGO
 - [**Review the batch script**](./TGO.bat) if you're curious about what changes are made.
 - If unsure, **create a restore point first.**
 
+Performance Improvements
+- Available in the [`Comparison`](./Comparison).
+
 Support
 - Open an issue in this repo if something goes wrong or if you want improvements.
