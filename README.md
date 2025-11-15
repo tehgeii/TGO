@@ -40,4 +40,14 @@ Performance Improvements
 - Available in the [`Comparison`](./Comparison).
 
 Support
-- Open an issue in this repo if something goes wrong or if you want improvements.
+- Open an [issue](https://github.com/tehgeii/TGO/issues) in this repo if something goes wrong or if you want improvements.
+#
+<div align="center">
+
+**TGOpti – Make Windows faster and smooth!**
+
+[Download Latest Release](https://github.com/tehgeii/TGO/releases) | [Report Issue](https://github.com/tehgeii/TGO/issues)
+
+*Made with ❤️ for the Windows community*
+
+</div>
