@@ -44,7 +44,7 @@ Support
 #
 <div align="center">
 
-**TGOpti – Make Windows faster and smooth!**
+**TGO – Make Windows faster and smooth!**
 
 [Download Latest Release](https://github.com/tehgeii/TGO/releases) | [Report Issue](https://github.com/tehgeii/TGO/issues)
 
