@@ -28,7 +28,7 @@ How to run
 
 Is this a virus?
 - Short answer: **No.** - this is an open batch script that edits system settings. It's not an installer or obfuscated binary.
-- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/1d2e751708b5e1556a735fbafcf056ca6cf8b96ffa1a2c38aa91222c069c4fa4
+- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/a3efed5b37f08be0ab1ca79e158c6ee54473170ad5b18325dfc8ce5fd74ee636
 
 Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
