@@ -22,7 +22,7 @@ What the script can do
 - **Exit**: quit the script.
 
 How to run
-1. Get and download `TGO.bat` from the [**latest release**](https://github.com/tehgeii/TGO/releases).
+1. Get and download `TGO.bat` from the [**latest release**](https://github.com/tehgeii/TGO/releases/latest).
 2. Right-click `TGO.bat` and choose "Run as administrator".
 3. Use the on-screen menu to pick an option and follow any prompts.
 4. Restart your PC for changes to take effect.
