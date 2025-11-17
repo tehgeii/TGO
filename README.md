@@ -34,6 +34,7 @@ Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
 - [**Review the batch script**](./TGO.bat) if you're curious about what changes are made.
 - If unsure, **create a restore point first.**
+- Watch [**here**](https://youtu.be/kOw1KssCeN0) for the guide.
 
 Performance Improvements
 - Available in the [`Comparison`](./Comparison).
