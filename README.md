@@ -3,6 +3,7 @@
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Downloads)](https://github.com/tehgeii/TGO/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
 [![Version](https://img.shields.io/badge/Version-1.4.0-blue.svg)](https://github.com/tehgeii/TGO/releases)
+[![Donate on Saweria](https://img.shields.io/badge/Donate_here:_-Saweria-ffdd00)](https://saweria.co/TechGameplayID)
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
