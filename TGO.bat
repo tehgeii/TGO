@@ -45,27 +45,34 @@ if %WIN_BUILD% GEQ 22000 (
 :: GPU Info
 :: Default Value
 set "GPU_MODEL_DETAIL=Basic Display Adapter"
-set "OPTIMIZE_GPU=INTEL"
+set "OPTIMIZE_GPU=UNKNOWN"
 
 :: Check for NVIDIA
+:: method 1: Check GPU name for NVIDIA keywords
 powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name" | findstr /i "NVIDIA" >nul
 if %errorlevel% equ 0 (
     set "OPTIMIZE_GPU=NVIDIA"
-    :: Get full GPU model name
     for /f "usebackq tokens=*" %%N in (`powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Where-Object { $_.Name -match 'NVIDIA' } | Select-Object -ExpandProperty Name | Select-Object -First 1"`) do set "GPU_MODEL_DETAIL=%%N"
     goto :HARDWARE_DONE
 )
+:: method 2: Check PNPDeviceID for NVIDIA vendor ID (VEN_10DE)
+for /f "tokens=*" %%A in ('powershell -NoProfile -Command "$gpus = Get-CimInstance Win32_VideoController; foreach($gpu in $gpus) { if($gpu.PNPDeviceID -match 'VEN_10DE') { $gpu.Name; break } }"') do (
+    if not "%%A"=="" (
+        set "OPTIMIZE_GPU=NVIDIA"
+        set "GPU_MODEL_DETAIL=%%A"
+        goto :HARDWARE_DONE
+    )
+)
 
-:: Check for AMD (if NVIDIA not found)
-:: Method 1: By Name (AMD / Radeon / ATI)
+:: Check for AMD
+:: method 1: Check GPU name for AMD/ATI/Radeon keywords
 powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name" | findstr /i "AMD Radeon ATI" >nul
 if %errorlevel% equ 0 (
     set "OPTIMIZE_GPU=AMD"
     for /f "usebackq tokens=*" %%A in (`powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Where-Object { $_.Name -match 'AMD' -or $_.Name -match 'Radeon' -or $_.Name -match 'ATI' } | Select-Object -ExpandProperty Name | Select-Object -First 1"`) do set "GPU_MODEL_DETAIL=%%A"
     goto :HARDWARE_DONE
 )
-
-:: Method 2: By Vendor ID (1002 = AMD/ATI)
+::method 2: Check PNPDeviceID for AMD vendor ID (VEN_1002)
 for /f "tokens=*" %%A in ('powershell -NoProfile -Command "$gpus = Get-CimInstance Win32_VideoController; foreach($gpu in $gpus) { if($gpu.PNPDeviceID -match 'VEN_1002') { $gpu.Name; break } }"') do (
     if not "%%A"=="" (
         set "OPTIMIZE_GPU=AMD"
@@ -74,12 +81,21 @@ for /f "tokens=*" %%A in ('powershell -NoProfile -Command "$gpus = Get-CimInstan
     )
 )
 
-:: Check for Intel (if neither NVIDIA nor AMD found)
+:: Check for INTEL
+:: method 1: Check GPU name for Intel keywords
 powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name" | findstr /i "Intel" >nul
 if %errorlevel% equ 0 (
     set "OPTIMIZE_GPU=INTEL"
     for /f "usebackq tokens=*" %%I in (`powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Where-Object { $_.Name -match 'Intel' } | Select-Object -ExpandProperty Name | Select-Object -First 1"`) do set "GPU_MODEL_DETAIL=%%I"
     goto :HARDWARE_DONE
+)
+:: method 2: Check PNPDeviceID for Intel vendor ID (VEN_8086)
+for /f "tokens=*" %%A in ('powershell -NoProfile -Command "$gpus = Get-CimInstance Win32_VideoController; foreach($gpu in $gpus) { if($gpu.PNPDeviceID -match 'VEN_8086') { $gpu.Name; break } }"') do (
+    if not "%%A"=="" (
+        set "OPTIMIZE_GPU=INTEL"
+        set "GPU_MODEL_DETAIL=%%A"
+        goto :HARDWARE_DONE
+    )
 )
 
 :HARDWARE_DONE
@@ -155,27 +171,28 @@ goto MAIN_MENU
 
 :MAIN_MENU
 cls
-title TGO v1.4.0
+title TGO v1.5.5
 color 0F
 echo.
 echo =========================================
 echo       TGO - Tech Gameplay Optimizer
-echo               Version 1.4.0
+echo               Version 1.5.5
 echo =========================================
 echo.
 echo [0] Restore Point
 echo [1] Clean All Temporary Files
-echo [2] Disk Optimization (HDD/SSD)
+echo [2] Disk Optimization
 echo [3] Mouse and Keyboard Optimization
 echo [4] RAM Optimization
 echo [5] Startup Optimization
 echo [6] Disable All Power Saving Features
 echo [7] CPU Optimization (Detected: %CPU_TYPE%)
 echo [8] GPU Optimization (Detected: %OPTIMIZE_GPU%)
+echo [9] Additional Tweaks
 echo [C] Changelog
 echo [E] Exit
 echo.
-set /p choice="Select option [0-8/C/R/E]: "
+set /p choice="Select option [0-9/C/E]: "
 
 if "%choice%"=="0" goto SYSTEM_RESTORE_MENU
 if "%choice%"=="1" goto CLEAN_TEMP
@@ -186,6 +203,7 @@ if "%choice%"=="5" goto STARTUP_OPTIMIZATION
 if "%choice%"=="6" goto POWER_SAVING
 if "%choice%"=="7" goto CPU_MENU
 if "%choice%"=="8" goto GPU_MENU
+if "%choice%"=="9" goto ADDITIONAL_TWEAKS
 if /i "%choice%"=="C" goto CHANGELOG
 if /i "%choice%"=="E" exit
 
@@ -209,6 +227,11 @@ echo.
 echo This may take a few minutes.
 echo Please wait...
 echo.
+
+:: Flush DNS cache
+echo [0/8] Flushing DNS cache...
+echo.
+ipconfig /flushdns >nul 2>&1
 
 :: Clean Windows temp files
 echo [1/8] Cleaning Windows temp files...
@@ -238,6 +261,7 @@ echo [4/8] Cleaning thumbnail cache...
 echo.
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" >nul 2>&1
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\*.db" >nul 2>&1
+del /s /f /q "%LocalAppData%\D3DSCache\*.*" >nul 2>&1
 
 :: Clean Windows Update cache
 echo [5/8] Cleaning Windows Update cache...
@@ -247,6 +271,7 @@ net stop UsoSvc >nul 2>&1
 net stop bits >nul 2>&1
 net stop dosvc >nul 2>&1
 
+rd /s /q "%windir%\ServiceProfiles\LocalService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache" >nul 2>&1
 rd /s /q "%windir%\SoftwareDistribution" >nul 2>&1
 md "%windir%\SoftwareDistribution" >nul 2>&1
 
@@ -850,7 +875,7 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 )
 
 :: Check first if the file already exists, no need to download it again and skip to the main part
-set download_dir=C:\TGOptiResources\Autoruns
+set download_dir=C:\TGOResources\Autoruns
 if not exist "%download_dir%\%autoruns_exe%" (
     echo.
     echo Downloading Autoruns...
@@ -1215,8 +1240,8 @@ echo Extracting...
 rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
 powershell -command "Expand-Archive -Path '%temp%\TGOResources.zip' -DestinationPath '%temp%\TGOResources_Extract' -Force"
 echo.
-if not exist "C:\TGOptiResources" mkdir "C:\TGOptiResources"
-xcopy /E /I /Y "%temp%\TGOResources_Extract\TGOResources-main\*" "C:\TGOptiResources\PowerPlan" >nul 2>&1
+if not exist "C:\TGOResources" mkdir "C:\TGOResources"
+xcopy /E /I /Y "%temp%\TGOResources_Extract\TGOResources-main\*" "C:\TGOResources\" >nul 2>&1
 
 echo.
 echo [SUCCESS] Power plan downloaded and extracted.
@@ -1234,15 +1259,15 @@ echo Importing TGP...
 echo.
 
 :: check if file exists
-if not exist "C:\TGOptiResources\PowerPlan\TGP.pow" (
+if not exist "C:\TGOResources\TGP.pow" (
     color 0C
-    echo [FAILED] TGP.pow not found in C:\TGOptiResources\PowerPlan
+    echo [FAILED] TGP.pow not found in C:\TGOResources\
     echo Please ensure the download was successful.
     pause
     goto CPU_MENU
 )
 
-powercfg -import "C:\TGOptiResources\PowerPlan\TGP.pow" 00000000-0000-0000-0000-000000000000 >nul 2>&1
+powercfg -import "C:\TGOResources\TGP.pow" 00000000-0000-0000-0000-000000000000 >nul 2>&1
 powercfg -setactive 00000000-0000-0000-0000-000000000000 >nul 2>&1
 
 :: check if activated
@@ -1286,15 +1311,15 @@ echo Importing TGE...
 echo.
 
 :: check if file exists
-if not exist "C:\TGOptiResources\PowerPlan\TGE.pow" (
+if not exist "C:\TGOResources\TGE.pow" (
     color 0C
-    echo [FAILED] TGE.pow not found in C:\TGOptiResources\PowerPlan
+    echo [FAILED] TGE.pow not found in C:\TGOResources\
     echo Please ensure the download was successful.
     pause
     goto CPU_MENU
 )
 
-powercfg -import "C:\TGOptiResources\PowerPlan\TGE.pow" 11111111-1111-1111-1111-111111111111 >nul 2>&1
+powercfg -import "C:\TGOResources\TGE.pow" 11111111-1111-1111-1111-111111111111 >nul 2>&1
 powercfg -setactive 11111111-1111-1111-1111-111111111111 >nul 2>&1
 
 :: check if activated
@@ -1427,6 +1452,8 @@ for /f "tokens=*" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Clas
         set FOUND_NVIDIA=1
         reg add "%%p" /v "DisableDynamicPstate" /t REG_DWORD /d 1 /f >nul 2>&1
         reg add "%%p" /v "RMHdcpKeyglobZero" /t REG_DWORD /d 1 /f >nul 2>&1
+        reg add "%%p" /v "PreferSystemMemoryContiguous" /t REG_DWORD /d 1 /f >nul 2>&1
+        reg add "%%p" /v "D3PCLatency" /t REG_DWORD /d 1 /f >nul 2>&1
     )
 )
 
@@ -1438,6 +1465,40 @@ if "%FOUND_NVIDIA%"=="0" (
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "QosManagesIdleProcessors" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /t REG_DWORD /d 1 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatencyCheckEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceDefault" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceFSVP" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyTolerancePerfOverride" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceScreenOffIR" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceVSyncEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "RtlCapabilityCheckLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleShortTime" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleVeryLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceMemory" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContextMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceOther" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceTimerPeriod" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceActivelyUsed" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MiracastPerfTrackGraphicsLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "NvBackend" /f >nul 2>&1
     echo [SUCCESS] NVIDIA GPU Optimization Applied.
 )
 pause
@@ -1466,8 +1527,57 @@ for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class
         reg add "%%k" /v "KMD_EnableContextBasedPowerManagement" /t REG_DWORD /d 0 /f >nul 2>&1
         reg add "%%k" /v "StutterMode" /t REG_DWORD /d 0 /f >nul 2>&1
         reg add "%%k" /v "KMD_DeLagEnabled" /t REG_DWORD /d 1 /f >nul 2>&1
+        reg add "%%k" /v "DisableBlockWrite" /t REG_DWORD /d 0 /f >nul 2>&1
+        reg add "%%k" /v "DisabledMACopy" /t REG_DWORD /d 1 /f >nul 2>&1
+        reg add "%%k" /v "KMD_FRTEnabled" /t REG_DWORD /d 0 /f >nul 2>&1
+        reg add "%%k" /v "AutoColorDepthReduction_NA" /t REG_DWORD /d 0 /f >nul 2>&1
+        reg add "%%k" /v "AllowSkins" /t REG_SZ /d "false" /f >nul 2>&1
+        reg add "%%k" /v "Adaptive De-interlacing" /t REG_DWORD /d 1 /f >nul 2>&1
+        reg add "%%k" /v "AreaAniso_NA" /t REG_SZ /d "0" /f >nul 2>&1
+        reg add "%%k" /v "AllowSubscription" /t REG_DWORD /d 0 /f >nul 2>&1
+        reg add "%%k\UMD" /v "Main3D_DEF" /t REG_SZ /d "1" /f >nul 2>&1
+        reg add "%%k\UMD" /v "Main3D" /t REG_BINARY /d "3100" /f >nul 2>&1
+        reg add "%%k\UMD" /v "FlipQueueSize" /t REG_BINARY /d "3100" /f >nul 2>&1
+        reg add "%%k\UMD" /v "ShaderCache" /t REG_BINARY /d "3200" /f >nul 2>&1
+        reg add "%%k\UMD" /v "TFQ" /t REG_BINARY /d "3200" /f >nul 2>&1
+
+        for /f "delims=" %%h in ('reg query "%%k" /s /f "Option" ^| findstr /i "DAL2_DATA.*DisplayPath.*Option"') do (
+            reg add "%%h" /v "ProtectionControl" /t REG_BINARY /d "0100000001000000" /f >nul 2>&1
+        )
     )
 )
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\amdlog" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatencyCheckEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceDefault" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceFSVP" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyTolerancePerfOverride" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceScreenOffIR" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceVSyncEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "RtlCapabilityCheckLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleShortTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleVeryLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceMemory" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContextMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceOther" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceTimerPeriod" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceActivelyUsed" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MiracastPerfTrackGraphicsLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
 
 if "%FOUND_AMD%"=="0" echo [INFO] No AMD GPU keys found.
 if "%FOUND_AMD%"=="1" echo [SUCCESS] AMD GPU Optimization Applied.
@@ -1495,6 +1605,39 @@ for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class
     )
 )
 reg add "HKLM\SOFTWARE\Intel\GMM" /v "DedicatedSegmentSize" /t REG_DWORD /d 512 /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "ExitLatencyCheckEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceDefault" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceFSVP" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyTolerancePerfOverride" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceScreenOffIR" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "LatencyToleranceVSyncEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "RtlCapabilityCheckLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleShortTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultD3TransitionLatencyIdleVeryLongTime" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle0MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceIdle1MonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceMemory" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceNoContextMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceOther" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultLatencyToleranceTimerPeriod" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceActivelyUsed" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceMonitorOff" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DefaultMemoryRefreshLatencyToleranceNoContext" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Latency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MiracastPerfTrackGraphicsLatency" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
 
 if "%FOUND_INTEL%"=="0" echo [INFO] No Intel GPU keys found.
 if "%FOUND_INTEL%"=="1" echo [SUCCESS] Intel GPU Optimization Applied.
@@ -1521,11 +1664,15 @@ if "%OPTIMIZE_GPU%"=="NVIDIA" (
             echo Reverting tweaks on: %%p
             reg delete "%%p" /v "DisableDynamicPstate" /f >nul 2>&1
             reg delete "%%p" /v "RMHdcpKeyglobZero" /f >nul 2>&1
+            reg delete "%%p" /v "PreferSystemMemoryContiguous" /f >nul 2>&1
+            reg delete "%%p" /v "D3PCLatency" /f >nul 2>&1
         )
     )
     reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "QosManagesIdleProcessors" /f >nul 2>&1
     reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /f >nul 2>&1
     reg delete "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
 if "%OPTIMIZE_GPU%"=="AMD" (
     echo Reverting AMD Tweaks...
@@ -1541,6 +1688,23 @@ if "%OPTIMIZE_GPU%"=="AMD" (
             reg delete "%%k" /v "KMD_EnableContextBasedPowerManagement" /f >nul 2>&1
             reg delete "%%k" /v "StutterMode" /f >nul 2>&1
             reg delete "%%k" /v "KMD_DeLagEnabled" /f >nul 2>&1
+            reg delete "%%k" /v "DisableBlockWrite" /f >nul 2>&1
+            reg delete "%%k" /v "DisabledMACopy" /f >nul 2>&1
+            reg delete "%%k" /v "KMD_FRTEnabled" /f >nul 2>&1
+            reg delete "%%k" /v "AutoColorDepthReduction_NA" /f >nul 2>&1
+            reg delete "%%k" /v "AllowSkins" /f >nul 2>&1
+            reg delete "%%k" /v "Adaptive De-interlacing" /f >nul 2>&1
+            reg delete "%%k" /v "AreaAniso_NA" /f >nul 2>&1
+            reg delete "%%k" /v "AllowSubscription" /f >nul 2>&1
+            reg delete "%%k\UMD" /v "Main3D_DEF" /f >nul 2>&1
+            reg delete "%%k\UMD" /v "Main3D" /f >nul 2>&1
+            reg delete "%%k\UMD" /v "FlipQueueSize" /f >nul 2>&1
+            reg delete "%%k\UMD" /v "ShaderCache" /f >nul 2>&1
+            reg delete "%%k\UMD" /v "TFQ" /f >nul 2>&1
+
+            for /f "delims=" %%h in ('reg query "%%k" /s /f "Option" ^| findstr /i "DAL2_DATA.*DisplayPath.*Option"') do (
+                reg delete "%%h" /v "ProtectionControl" /f >nul 2>&1
+            )
         )
     )
 )
@@ -1561,6 +1725,8 @@ if "%OPTIMIZE_GPU%"=="INTEL" (
         )
     )
     reg delete "HKLM\SOFTWARE\Intel\GMM" /v "DedicatedSegmentSize" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
 cls
 color 0A
@@ -1581,6 +1747,13 @@ echo =========================================
 echo           TGO CHANGELOG
 echo =========================================
 echo.
+echo [v1.5.5]
+echo  + Added Additional Tweaks Menu.
+echo  + Updated GPU Optimization with more tweaks.
+echo  + Updated Clean All Temporary Files.
+echo  + Fixed Hardware Detection for some models.
+echo  + And more...
+echo.
 echo [v1.4.0]
 echo  + Added Hardware Detection (OS, CPU, GPU)
 echo  + Added CPU Optimization Menu.
@@ -1595,6 +1768,286 @@ echo + Initial Release of Tech Gameplay Optimizer (TGO)
 echo.
 pause
 goto MAIN_MENU
+
+:: ============================================================================
+:: ADDITIONAL TWEAKS
+:: ============================================================================
+:ADDITIONAL_TWEAKS
+call :DOWNLOAD_RESOURCESS
+cls
+title Additional Tweaks
+color 0F
+echo.
+echo =====================================
+echo           ADDITIONAL TWEAKS
+echo =====================================
+echo.
+echo [1] Turn on or off Windows Update
+echo [2] Turn on or off Windows Security (Permanently)
+echo [3] Turn off all Windows Animations
+echo [4] Delete all useless apps via third-party tool
+echo [5] Turn on or off User Account Control
+echo [B] Back to Main Menu
+echo.
+set /p add_choice="Select option [1-5/B]: "
+
+if "%add_choice%"=="1" goto WINDOWS_UPDATE
+if "%add_choice%"=="2" goto WINDOWS_SECURITY
+if "%add_choice%"=="3" goto ADVANCED_SYSTEM_SETTINGS
+if "%add_choice%"=="4" goto DELETE_APPS
+if "%add_choice%"=="5" goto UAC
+if /i "%add_choice%"=="B" goto MAIN_MENU
+
+echo Invalid choice
+echo Press any key to continue...
+pause >nul
+goto ADDITIONAL_TWEAKS
+
+:ADVANCED_SYSTEM_SETTINGS
+cls
+color 0E
+echo.
+echo ==============================================
+echo Follow this step to disable all the animations
+echo ==============================================
+echo 1. Performance Options window will be open shortly...
+echo 2. Choose 'Adjust for best performance'.
+echo 3. Check the box 'Show thumbnails instead of icons', 'Smooth edges of screen fonts',
+echo    and 'Show window contents while dragging'.
+echo 4. After that, click 'Apply' and then 'OK' to save the settings.
+echo 5. CLOSE the Performance Options window to finish this step.
+echo ==============================================
+echo.
+
+start /wait "" %windir%\System32\SystemPropertiesPerformance.exe
+
+cls
+color 0A
+echo.
+echo [SUCCESS] Performance Options window closed. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:DOWNLOAD_RESOURCESS
+cls
+color 0E
+echo.
+echo Downloading all the materials...
+echo.
+
+if exist "C:\TGOResources\" (
+    exit /b
+)
+
+curl -L -o "%temp%\TGOResources.zip" "https://github.com/tehgeii/TGOResources/archive/refs/heads/main.zip"
+
+if %errorlevel% neq 0 (
+    color 0C
+    echo [FAILED] Could not download all the materials.
+    echo Please check your internet connection.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+
+if exist "%temp%\TGOResources_Extract" rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
+
+powershell -command "Expand-Archive -Path '%temp%\TGOResources.zip' -DestinationPath '%temp%\TGOResources_Extract' -Force"
+
+if not exist "C:\TGOResources" mkdir "C:\TGOResources"
+
+xcopy /E /I /Y "%temp%\TGOResources_Extract\TGOResources-main\*" "C:\TGOResources\" >nul 2>&1
+
+del /f /q "%temp%\TGOResources.zip" >nul 2>&1
+rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
+
+echo.
+echo [SUCCESS] All the Additional Tweaks materials downloaded and extracted.
+exit /b
+
+:WINDOWS_UPDATE
+cls
+color 0E
+echo.
+echo ============================================
+echo         Windows Update Blocker Guide
+echo ============================================
+echo 1. Choose 'Disable Updates' (with the option checked) to turn off Windows Update.
+echo 2. Choose 'Enable Updates' to turn on Windows Update.
+echo 3. Then hit 'Apply Now' button to save the settings.
+echo 4. CLOSE the WUB window to finish this step.
+echo ============================================
+echo.
+:: check if file exists
+if not exist "C:\TGOResources\Wub_x64.exe" (
+    color 0C
+    echo [FAILED] Wub_x64.exe not found in C:\TGOResources\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+
+start /wait "" "C:\TGOResources\Wub_x64.exe"
+
+cls
+color 0A
+echo.
+echo [SUCCESS] Windows Update Blocker closed. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:WINDOWS_SECURITY
+cls
+color 0E
+echo.
+echo Waiting for all the processes related to Windows Security to be completed...
+echo.
+
+if not exist "C:\TGOResources\Disable Windows Security Permanent\PowerRun.exe" (
+    color 0C
+    echo [FAILED] PowerRun.exe not found in C:\TGOResources\Disable Windows Security Permanent\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+
+:: Set Path variabel
+set "BASE_PATH=C:\TGOResources\Disable Windows Security Permanent"
+set "PWR_EXE=%BASE_PATH%\PowerRun.exe"
+set "OFF_BAT=%BASE_PATH%\off.bat"
+set "OFF_REG=%BASE_PATH%\off.reg"
+
+powershell -Command "Start-Process -FilePath '%PWR_EXE%' -ArgumentList '\"%OFF_BAT%\"' -Wait"
+powershell -Command "Start-Process -FilePath '%PWR_EXE%' -ArgumentList 'regedit.exe', '/s', '\"%OFF_REG%\"' -Wait"
+
+cls
+color 0A
+echo.
+echo [SUCCESS] Windows Security has been turned off permanently. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:DELETE_APPS
+cls
+color 0E
+echo.
+echo ===========================================
+echo              Delete Apps Guide
+echo ===========================================
+echo 1. geek will be launched shortly...
+echo 2. Inside geek, select the apps you want to delete.
+echo 3. After selecting, right click on the selected apps and choose 'Uninstall'.
+echo 4. After the uninstallation is done, CLOSE geek to finish this step.
+echo ===========================================
+echo.
+:: check if file exists
+if not exist "C:\TGOResources\geek.exe" (
+    color 0C
+    echo [FAILED] geek not found in C:\TGOResources\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+
+start /wait "" "C:\TGOResources\geek.exe"
+
+cls
+color 0A
+echo.
+echo [SUCCESS] geek has been closed. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:UAC
+cls
+color 0F
+echo.
+echo Do you want to turn on or off User Account Control (UAC)?
+echo.
+echo [1] Turn ON UAC
+echo [2] Turn OFF UAC
+echo.
+set /p uac_choice="Select option [1-2]: "
+
+if "%uac_choice%"=="1" goto UAC_ON
+if "%uac_choice%"=="2" goto UAC_OFF
+
+echo Invalid choice
+echo Press any key to continue...
+pause >nul
+goto UAC
+echo.
+
+:UAC_OFF
+if not exist "C:\TGOResources\UAC Off\off.bat" (
+    color 0C
+    echo [FAILED] off.bat not found in C:\TGOResources\UAC Off\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+
+start /wait "" "C:\TGOResources\UAC Off\off.bat"
+
+cls
+color 0A
+echo.
+echo [SUCCESS] UAC has been turned off. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:UAC_ON
+if not exist "C:\TGOResources\UAC On\on.bat" (
+    color 0C
+    echo [FAILED] on.bat not found in C:\TGOResources\UAC On\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+start /wait "" "C:\TGOResources\UAC On\on.bat"
+
+:UACF
+cls
+color 0F
+echo.
+echo Do you want to remove the black screen when turning on UAC?
+echo.
+echo [1] Yes
+echo [2] No
+echo.
+set /p uacf_choice="Select option [1-2]: "
+
+if "%uacf_choice%"=="1" goto UACF_ON
+if "%uacf_choice%"=="2" goto UACF_OFF
+
+echo Invalid choice
+echo Press any key to continue...
+pause >nul
+goto UACF
+
+:UACF_ON
+if not exist "C:\TGOResources\UAC On\on without black screen.bat" (
+    color 0C
+    echo [FAILED] on without black screen.bat not found in C:\TGOResources\UAC On\
+    echo Please ensure the download was successful.
+    pause
+    goto ADDITIONAL_TWEAKS
+)
+start /wait "" "C:\TGOResources\UAC On\on without black screen.bat"
+
+cls
+color 0A
+echo.
+echo [SUCCESS] UAC has been turned on. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
+
+:UACF_OFF
+cls
+color 0A
+echo.
+echo [SUCCESS] UAC has been turned on. Returning to menu...
+timeout /t 3 >nul
+goto ADDITIONAL_TWEAKS
 
 :: ============================================================================
 :: END OF SCRIPT
