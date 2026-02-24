@@ -108,6 +108,21 @@ echo "%CPU_MODEL%" | findstr /i "Intel" >nul && set CPU_TYPE=INTEL
 
 setlocal enabledelayedexpansion
 
+:RESOURCES
+cls
+if not exist "C:\TGO\Disable Windows Security Permanent\off.bat"      goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\Disable Windows Security Permanent\off.reg"      goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\UAC Off\off.bat"                                 goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\UAC On\on without black screen.bat"              goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\UAC On\on.bat"                                   goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\geek.exe"                                        goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\TGE.pow"                                         goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\TGP.pow"                                         goto DOWNLOAD_RESOURCES
+if not exist "C:\TGO\Wub_x64.exe"                                     goto DOWNLOAD_RESOURCES
+
+goto STARTUP_RESTORE_CHECK
+
 :STARTUP_RESTORE_CHECK
 cls
 color 0E
@@ -171,12 +186,12 @@ goto MAIN_MENU
 
 :MAIN_MENU
 cls
-title TGO v1.5.5
+title TGO v1.5.6
 color 0F
 echo.
 echo =========================================
 echo       TGO - Tech Gameplay Optimizer
-echo               Version 1.5.5
+echo               Version 1.5.6
 echo =========================================
 echo.
 echo [0] Restore Point
@@ -189,6 +204,7 @@ echo [6] Disable All Power Saving Features
 echo [7] CPU Optimization (Detected: %CPU_TYPE%)
 echo [8] GPU Optimization (Detected: %OPTIMIZE_GPU%)
 echo [9] Additional Tweaks
+echo [R] Redownload All Resources
 echo [C] Changelog
 echo [E] Exit
 echo.
@@ -205,6 +221,7 @@ if "%choice%"=="7" goto CPU_MENU
 if "%choice%"=="8" goto GPU_MENU
 if "%choice%"=="9" goto ADDITIONAL_TWEAKS
 if /i "%choice%"=="C" goto CHANGELOG
+if /i "%choice%"=="R" goto REDOWNLOAD
 if /i "%choice%"=="E" exit
 
 echo Invalid choice
@@ -875,7 +892,7 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 )
 
 :: Check first if the file already exists, no need to download it again and skip to the main part
-set download_dir=C:\TGOResources\Autoruns
+set download_dir=C:\TGO\Autoruns
 if not exist "%download_dir%\%autoruns_exe%" (
     echo.
     echo Downloading Autoruns...
@@ -1220,38 +1237,10 @@ echo Press any key to continue...
 pause >nul
 goto CPU_MENU
 
-:DOWNLOAD_RESOURCES
-cls
-color 0E
-echo.
-echo Downloading the power plan...
-echo.
-curl -L -o "%temp%\TGOResources.zip" "https://github.com/tehgeii/TGOResources/archive/refs/heads/main.zip"
-
-if not exist "%temp%\TGOResources.zip" (
-    color 0C
-    echo [FAILED] Could not download the power plan. Check your internet connection.
-    pause
-    goto CPU_MENU
-)
-
-echo.
-echo Extracting...
-rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
-powershell -command "Expand-Archive -Path '%temp%\TGOResources.zip' -DestinationPath '%temp%\TGOResources_Extract' -Force"
-echo.
-if not exist "C:\TGOResources" mkdir "C:\TGOResources"
-xcopy /E /I /Y "%temp%\TGOResources_Extract\TGOResources-main\*" "C:\TGOResources\" >nul 2>&1
-
-echo.
-echo [SUCCESS] Power plan downloaded and extracted.
-exit /b
-
 :: ==============================================================
 :: TGP (TECH GAMEPLAY PERFORMANCE)
 :: ==============================================================
 :SMART_POWER_PLAN
-call :DOWNLOAD_RESOURCES
 cls
 color 0E
 echo.
@@ -1259,15 +1248,15 @@ echo Importing TGP...
 echo.
 
 :: check if file exists
-if not exist "C:\TGOResources\TGP.pow" (
+if not exist "C:\TGO\TGP.pow" (
     color 0C
-    echo [FAILED] TGP.pow not found in C:\TGOResources\
+    echo [FAILED] TGP.pow not found in C:\TGO\
     echo Please ensure the download was successful.
     pause
     goto CPU_MENU
 )
 
-powercfg -import "C:\TGOResources\TGP.pow" 00000000-0000-0000-0000-000000000000 >nul 2>&1
+powercfg -import "C:\TGO\TGP.pow" 00000000-0000-0000-0000-000000000000 >nul 2>&1
 powercfg -setactive 00000000-0000-0000-0000-000000000000 >nul 2>&1
 
 :: check if activated
@@ -1303,7 +1292,6 @@ goto CPU_MENU
 :: TGE (TECH GAMEPLAY ENERGY SAVING)
 :: ==============================================================
 :ENERGY_SAVING_PLAN
-call :DOWNLOAD_RESOURCES
 cls
 color 0E
 echo.
@@ -1311,15 +1299,15 @@ echo Importing TGE...
 echo.
 
 :: check if file exists
-if not exist "C:\TGOResources\TGE.pow" (
+if not exist "C:\TGO\TGE.pow" (
     color 0C
-    echo [FAILED] TGE.pow not found in C:\TGOResources\
+    echo [FAILED] TGE.pow not found in C:\TGO\
     echo Please ensure the download was successful.
     pause
     goto CPU_MENU
 )
 
-powercfg -import "C:\TGOResources\TGE.pow" 11111111-1111-1111-1111-111111111111 >nul 2>&1
+powercfg -import "C:\TGO\TGE.pow" 11111111-1111-1111-1111-111111111111 >nul 2>&1
 powercfg -setactive 11111111-1111-1111-1111-111111111111 >nul 2>&1
 
 :: check if activated
@@ -1747,6 +1735,10 @@ echo =========================================
 echo           TGO CHANGELOG
 echo =========================================
 echo.
+echo [v1.5.6]
+echo  + Added Redownload All Resources Menu.
+echo  + Improved Download Reliability.
+echo.
 echo [v1.5.5]
 echo  + Added Additional Tweaks Menu.
 echo  + Updated GPU Optimization with more tweaks.
@@ -1773,7 +1765,6 @@ goto MAIN_MENU
 :: ADDITIONAL TWEAKS
 :: ============================================================================
 :ADDITIONAL_TWEAKS
-call :DOWNLOAD_RESOURCESS
 cls
 title Additional Tweaks
 color 0F
@@ -1783,7 +1774,7 @@ echo           ADDITIONAL TWEAKS
 echo =====================================
 echo.
 echo [1] Turn on or off Windows Update
-echo [2] Turn on or off Windows Security (Permanently)
+echo [2] Turn off Windows Security (Permanently)
 echo [3] Turn off all Windows Animations
 echo [4] Delete all useless apps via third-party tool
 echo [5] Turn on or off User Account Control
@@ -1828,41 +1819,85 @@ echo [SUCCESS] Performance Options window closed. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
-:DOWNLOAD_RESOURCESS
+:DOWNLOAD_RESOURCES
 cls
 color 0E
 echo.
-echo Downloading all the materials...
+echo Downloading all the resources... (Completely Safe)
 echo.
 
-if exist "C:\TGOResources\" (
-    exit /b
-)
+if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Windows Security Permanent"
+if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
+if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
 
-curl -L -o "%temp%\TGOResources.zip" "https://github.com/tehgeii/TGOResources/archive/refs/heads/main.zip"
+echo [1/10] Downloading.
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
+echo [2/10] Downloading..
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
+echo [3/10] Downloading...
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
 
-if %errorlevel% neq 0 (
-    color 0C
-    echo [FAILED] Could not download all the materials.
-    echo Please check your internet connection.
-    pause
-    goto ADDITIONAL_TWEAKS
-)
+echo [4/10] Downloading....
+curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
+echo [5/10] Downloading.....
+curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
+echo [6/10] Downloading......
+curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
 
-if exist "%temp%\TGOResources_Extract" rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
-
-powershell -command "Expand-Archive -Path '%temp%\TGOResources.zip' -DestinationPath '%temp%\TGOResources_Extract' -Force"
-
-if not exist "C:\TGOResources" mkdir "C:\TGOResources"
-
-xcopy /E /I /Y "%temp%\TGOResources_Extract\TGOResources-main\*" "C:\TGOResources\" >nul 2>&1
-
-del /f /q "%temp%\TGOResources.zip" >nul 2>&1
-rmdir /s /q "%temp%\TGOResources_Extract" >nul 2>&1
+echo [7/10] Downloading.......
+curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
+echo [8/10] Downloading........
+curl -g -k -L -# -o "C:\TGO\TGE.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGE.pow" >nul 2>&1  
+echo [9/10] Downloading.........
+curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
+echo [10/10] Downloading..........
+curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
 
 echo.
-echo [SUCCESS] All the Additional Tweaks materials downloaded and extracted.
-exit /b
+echo All resources downloaded successfully.
+timeout /t 2 >nul
+cls
+goto STARTUP_RESTORE_CHECK
+
+:REDOWNLOAD
+cls
+color 0E
+echo.
+echo Redownloading all the resources... (Completely Safe)
+echo.
+
+if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Windows Security Permanent"
+if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
+if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
+
+echo [1/10] Downloading.
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
+echo [2/10] Downloading..
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
+echo [3/10] Downloading...
+curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
+
+echo [4/10] Downloading....
+curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
+echo [5/10] Downloading.....
+curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
+echo [6/10] Downloading......
+curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
+
+echo [7/10] Downloading.......
+curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
+echo [8/10] Downloading........
+curl -g -k -L -# -o "C:\TGO\TGE.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGE.pow" >nul 2>&1  
+echo [9/10] Downloading.........
+curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
+echo [10/10] Downloading..........
+curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
+
+echo.
+echo All resources downloaded successfully.
+timeout /t 2 >nul
+cls
+goto MAIN_MENU
 
 :WINDOWS_UPDATE
 cls
@@ -1878,15 +1913,15 @@ echo 4. CLOSE the WUB window to finish this step.
 echo ============================================
 echo.
 :: check if file exists
-if not exist "C:\TGOResources\Wub_x64.exe" (
+if not exist "C:\TGO\Wub_x64.exe" (
     color 0C
-    echo [FAILED] Wub_x64.exe not found in C:\TGOResources\
+    echo [FAILED] Wub_x64.exe not found in C:\TGO\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
 
-start /wait "" "C:\TGOResources\Wub_x64.exe"
+start /wait "" "C:\TGO\Wub_x64.exe"
 
 cls
 color 0A
@@ -1902,16 +1937,16 @@ echo.
 echo Waiting for all the processes related to Windows Security to be completed...
 echo.
 
-if not exist "C:\TGOResources\Disable Windows Security Permanent\PowerRun.exe" (
+if not exist "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" (
     color 0C
-    echo [FAILED] PowerRun.exe not found in C:\TGOResources\Disable Windows Security Permanent\
+    echo [FAILED] PowerRun.exe not found in C:\TGO\Disable Windows Security Permanent\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
 
 :: Set Path variabel
-set "BASE_PATH=C:\TGOResources\Disable Windows Security Permanent"
+set "BASE_PATH=C:\TGO\Disable Windows Security Permanent"
 set "PWR_EXE=%BASE_PATH%\PowerRun.exe"
 set "OFF_BAT=%BASE_PATH%\off.bat"
 set "OFF_REG=%BASE_PATH%\off.reg"
@@ -1940,15 +1975,15 @@ echo 4. After the uninstallation is done, CLOSE geek to finish this step.
 echo ===========================================
 echo.
 :: check if file exists
-if not exist "C:\TGOResources\geek.exe" (
+if not exist "C:\TGO\geek.exe" (
     color 0C
-    echo [FAILED] geek not found in C:\TGOResources\
+    echo [FAILED] geek not found in C:\TGO\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
 
-start /wait "" "C:\TGOResources\geek.exe"
+start /wait "" "C:\TGO\geek.exe"
 
 cls
 color 0A
@@ -1978,15 +2013,15 @@ goto UAC
 echo.
 
 :UAC_OFF
-if not exist "C:\TGOResources\UAC Off\off.bat" (
+if not exist "C:\TGO\UAC Off\off.bat" (
     color 0C
-    echo [FAILED] off.bat not found in C:\TGOResources\UAC Off\
+    echo [FAILED] off.bat not found in C:\TGO\UAC Off\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
 
-start /wait "" "C:\TGOResources\UAC Off\off.bat"
+start /wait "" "C:\TGO\UAC Off\off.bat"
 
 cls
 color 0A
@@ -1996,14 +2031,14 @@ timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :UAC_ON
-if not exist "C:\TGOResources\UAC On\on.bat" (
+if not exist "C:\TGO\UAC On\on.bat" (
     color 0C
-    echo [FAILED] on.bat not found in C:\TGOResources\UAC On\
+    echo [FAILED] on.bat not found in C:\TGO\UAC On\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
-start /wait "" "C:\TGOResources\UAC On\on.bat"
+start /wait "" "C:\TGO\UAC On\on.bat"
 
 :UACF
 cls
@@ -2025,14 +2060,14 @@ pause >nul
 goto UACF
 
 :UACF_ON
-if not exist "C:\TGOResources\UAC On\on without black screen.bat" (
+if not exist "C:\TGO\UAC On\on without black screen.bat" (
     color 0C
-    echo [FAILED] on without black screen.bat not found in C:\TGOResources\UAC On\
+    echo [FAILED] on without black screen.bat not found in C:\TGO\UAC On\
     echo Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
-start /wait "" "C:\TGOResources\UAC On\on without black screen.bat"
+start /wait "" "C:\TGO\UAC On\on without black screen.bat"
 
 cls
 color 0A
