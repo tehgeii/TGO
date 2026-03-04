@@ -4,7 +4,6 @@
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
 [![Version](https://img.shields.io/badge/Version-1.5.6-blue.svg)](https://github.com/tehgeii/TGO/releases)
 [![Donate on kofi](https://img.shields.io/badge/Donate%20on-Ko--fi-ffdd00?logo=ko-fi&logoColor=black)](https://ko-fi.com/techgameplay)
-[![Donate on Saweria](https://img.shields.io/badge/Donate%20on-Saweria-ff4f00?logo=saweria&logoColor=white)](https://saweria.co/TechGameplayID)
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
@@ -43,3 +42,14 @@ Performance Improvements
 - Available in the [`Comparison`](./Comparison).
 
 Support
+- Open an [issue](https://github.com/tehgeii/TGO/issues) in this repo if something goes wrong or if you want improvements.
+#
+<div align="center">
+
+**TGO – Make Windows faster and smooth!**
+
+[Download Latest Release](https://github.com/tehgeii/TGO/releases) | [Report Issue](https://github.com/tehgeii/TGO/issues)
+
+*Made with ❤️ for the Windows community*
+
+</div>
