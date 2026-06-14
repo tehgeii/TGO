@@ -9,6 +9,9 @@
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
+Disclaimer
+- TGO modifies your Windows registry, services, and system settings. While the script includes revert options for most tweaks, **use at your own risk**. We recommend creating a System Restore point before running. The author is not responsible for any system issues caused by using TGO.
+
 Quick facts
 - Run as Administrator (the script will try to relaunch itself with elevation if needed).
 - It changes registry keys, services, and power settings — this can affect your system. **Be careful.**
@@ -38,10 +41,10 @@ Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
 - [**Review the batch script**](./TGO.bat) if you're curious about what changes are made.
 - If unsure, **create a restore point first.**
-- Watch [**here**]() for the guide. (soon!)
+- Watch here for the guide. (coming soon!)
 
 Performance Improvements
-- Available in the [`Comparison`](./Comparison).
+- Available in the [`Comparison`](./Comparison) folder.
 
 Support
 - Open an [issue](https://github.com/tehgeii/TGO/issues) in this repo if something goes wrong or if you want improvements.
