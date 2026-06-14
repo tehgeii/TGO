@@ -2,9 +2,8 @@
 
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Downloads)](https://github.com/tehgeii/TGO/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
-[![Version](https://img.shields.io/badge/Version-1.5.6-blue.svg)](https://github.com/tehgeii/TGO/releases)
-[![Donate on kofi](https://img.shields.io/badge/Donate%20on-Ko--fi-ffdd00?logo=ko-fi&logoColor=black)](https://ko-fi.com/techgameplay)
-[![Donate on Saweria](https://img.shields.io/badge/Donate%20on-Saweria-ffdd00?logo=saweria&logoColor=black)](https://saweria.co/TechGameplayID)
+[![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)](https://github.com/tehgeii/TGO/releases)
+[![Support on sociabuzz](https://img.shields.io/badge/Support%20on-sociabuzz-ffdd00?logo=sociabuzz&logoColor=black)](https://sociabuzz.com/tgi)
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
@@ -31,7 +30,7 @@ How to run
 
 Is this a virus?
 - Short answer: **No.** - this is an open batch script that edits system settings. It's not an installer or obfuscated binary.
-- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/d3c205222b64021f66d2f9d967b010fd7c2f6e025e1ab3569eca920ad575916c
+- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/b1d446487739b7688e5b3fc94ad39029709b437ccd6ac01b719a5117c4a453b8
 
 Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
