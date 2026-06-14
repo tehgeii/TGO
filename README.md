@@ -48,7 +48,7 @@ Support
 
 **TGO – Make Windows faster and smooth!**
 
-[Download Latest Release](https://github.com/tehgeii/TGO/releases) | [Report Issue](https://github.com/tehgeii/TGO/issues)
+[Download Latest Release](https://github.com/tehgeii/TGO/releases/latest) | [Report Issue](https://github.com/tehgeii/TGO/issues)
 
 *Made with ❤️ for the Windows community*
 
