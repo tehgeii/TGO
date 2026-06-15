@@ -46,7 +46,7 @@ TGO is a small Windows batch tool that applies simple tweaks to make Windows fee
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
 - [**Review the batch script**](./TGO.bat) if you're curious about what changes are made.
 - If unsure, **create a restore point first.**
-- Watch here for the guide. (coming soon!)
+- Watch [**here**](https://youtu.be/EkD8YTn7ISw) for the guide. (coming soon!)
 
 ### Performance Improvements
 - Available in the [`Comparison`](./Comparison) folder.
