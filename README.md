@@ -5,7 +5,7 @@
 [![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)](https://github.com/tehgeii/TGO/releases)
 [![Support on Sociabuzz](https://img.shields.io/badge/Support%20on-Sociabuzz-ffdd00?logo=sociabuzz&logoColor=black)](https://sociabuzz.com/tgi)
 
-<img width="500" alt="TGO main menu" src="https://github.com/user-attachments/assets/94b1a2cb-5cbc-45e6-abc9-d4f990a7c30b" />
+<img width="500" alt="TGO Main Menu" src="https://github.com/user-attachments/assets/33b35c39-fd1a-4dfa-af25-7f5cd226f3a9" />
 
 TGO is a small Windows batch tool that applies simple tweaks to make Windows feel snappier and improve input responsiveness for gaming.
 
