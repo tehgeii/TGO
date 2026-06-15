@@ -116,13 +116,21 @@ if %RAM_GB% gtr 128 set RAM_GB=128
 :: Storage Type Detection
 set "STORAGE_TYPE=UNKNOWN"
 
-:: Try getting the MediaType from the disk containing the C: drive using WMI (widely compatible)
-for /f "tokens=*" %%A in ('powershell -NoProfile -Command "try { $disk = Get-WmiObject Win32_LogicalDisk -Filter \"DeviceID='C:'\" | ForEach-Object { $_.DiskIndex }; $media = Get-WmiObject Win32_DiskDrive -Filter \"Index=$disk\" | Select-Object -ExpandProperty MediaType; if ($media -eq 12) { 'SSD' } elseif ($media -eq 11) { 'HDD' } else { 'UNKNOWN' } } catch { 'UNKNOWN' }" 2^>nul') do set "STORAGE_TYPE=%%A"
+:: Method 1: MediaType from Get-PhysicalDisk (most accurate)
+for /f "tokens=*" %%A in ('powershell -NoProfile -Command "try { $disk = Get-Partition -DriveLetter C | Get-Disk; $phys = $disk | Get-PhysicalDisk -ErrorAction Stop; $phys.MediaType } catch { '' }" 2^>nul') do set "STORAGE_TYPE=%%A"
 
-:: If it's still UNKNOWN, try with Get-PhysicalDisk (PowerShell 3.0 and above)
-if "%STORAGE_TYPE%"=="UNKNOWN" (
-    for /f "tokens=*" %%A in ('powershell -NoProfile -Command "try { (Get-PhysicalDisk | Where-Object { $_.DeviceId -eq 0 }).MediaType } catch { 'UNKNOWN' }" 2^>nul') do set "STORAGE_TYPE=%%A"
+:: Method 2: BusType + RotationalSpeed ​​(fallback if MediaType is empty)
+if "%STORAGE_TYPE%"=="" (
+    for /f "tokens=*" %%A in ('powershell -NoProfile -Command "try { $disk = Get-Partition -DriveLetter C | Get-Disk; $bus = $disk.BusType; $rot = $disk.RotationalSpeed; if ($bus -eq 'NVMe' -or ($bus -eq 'SATA' -and $rot -eq 0)) { 'SSD' } elseif ($rot -gt 0) { 'HDD' } else { '' } } catch { '' }" 2^>nul') do set "STORAGE_TYPE=%%A"
 )
+
+:: Method 3: Keyword in FriendlyName (backup if both methods above fail)
+if "%STORAGE_TYPE%"=="" (
+    for /f "tokens=*" %%A in ('powershell -NoProfile -Command "try { $disk = Get-Partition -DriveLetter C | Get-Disk; $model = $disk.FriendlyName; if ($model -match 'SSD|NVMe|Solid|M\\.2') { 'SSD' } else { 'HDD' } } catch { '' }" 2^>nul') do set "STORAGE_TYPE=%%A"
+)
+
+:: Method 4: If all else fails, leave it UNKNOWN (user will be guided manually in the menu)
+if "%STORAGE_TYPE%"=="" set "STORAGE_TYPE=UNKNOWN"
 
 setlocal enabledelayedexpansion
 
@@ -720,6 +728,7 @@ goto MAIN_MENU
 :: RAM OPTIMIZATION
 :: ============================================================================
 :RAM_OPTIMIZATION_MENU
+title RAM Optimization
 call :PRINT_HEADER
 color 0F
 echo     RAM OPTIMIZATION
@@ -1688,6 +1697,9 @@ title Changelog
 call :PRINT_HEADER
 color 0F
 echo     CHANGELOG
+echo.
+echo     [v2.0.1]
+echo       + Fixed Storage Type Detection for some models.
 echo.
 echo     [v2.0.0]
 echo       + Completely redesigned clean and modern UI
