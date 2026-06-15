@@ -40,7 +40,7 @@ TGO is a small Windows batch tool that applies simple tweaks to make Windows fee
 
 ### Is this a virus?
 - Short answer: **No.** - this is an open batch script that edits system settings. It's not an installer or obfuscated binary.
-- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/b1d446487739b7688e5b3fc94ad39029709b437ccd6ac01b719a5117c4a453b8
+- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/d4f8f705b3c699e8697acbf7d9442d80a9aa2aee2d9871bc455f0d3b5a637fbe
 
 ### Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
