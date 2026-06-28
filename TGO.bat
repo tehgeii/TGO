@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-mode con: cols=100 lines=60
+mode con: cols=100 lines=100
 
 :: Check if running as administrator
 fsutil dirty query %systemdrive% >nul
@@ -143,7 +143,6 @@ if not exist "C:\TGO\UAC Off\off.bat"                                 goto DOWNL
 if not exist "C:\TGO\UAC On\on without black screen.bat"              goto DOWNLOAD_RESOURCES
 if not exist "C:\TGO\UAC On\on.bat"                                   goto DOWNLOAD_RESOURCES
 if not exist "C:\TGO\geek.exe"                                        goto DOWNLOAD_RESOURCES
-if not exist "C:\TGO\TGE.pow"                                         goto DOWNLOAD_RESOURCES
 if not exist "C:\TGO\TGP.pow"                                         goto DOWNLOAD_RESOURCES
 if not exist "C:\TGO\Wub_x64.exe"                                     goto DOWNLOAD_RESOURCES
 
@@ -224,7 +223,7 @@ echo                        ██║   ╚██████╔╝╚███�
 echo                        ╚═╝    ╚═════╝  ╚═════╝ 
 echo.
 color 0F
-echo                    Tech Gameplay Optimizer  v2.0.1
+echo                    Tech Gameplay Optimizer  v2.1.0
 echo     ──────────────────────────────────────────────────────────────
 echo     •  OS: %OS_NAME%
 echo     •  CPU: %CPU_MODEL%
@@ -237,7 +236,7 @@ goto :eof
 
 :MAIN_MENU
 call :PRINT_HEADER
-title TGO v2.0.0
+title TGO v2.1.0
 color 0F
 echo     MAIN MENU
 echo.
@@ -249,6 +248,7 @@ echo     [5]  Startup Programs Manager
 echo     [6]  Disable Power Saving Features
 echo     [7]  CPU Optimization                  (Detected: %CPU_TYPE%)
 echo     [8]  GPU Optimization                  (Detected: %OPTIMIZE_GPU%)
+echo     [9]  Services Optimization
 echo.
 echo     [0]  System Restore and Recovery
 echo     [A]  Additional Tools and Tweaks
@@ -268,6 +268,7 @@ if "%choice%"=="5" goto STARTUP_OPTIMIZATION
 if "%choice%"=="6" goto POWER_SAVING
 if "%choice%"=="7" goto CPU_MENU
 if "%choice%"=="8" goto GPU_MENU
+if "%choice%"=="9" goto SERVICES_OPTIMIZATION_MENU
 if "%choice%"=="0" goto SYSTEM_RESTORE_MENU
 if /i "%choice%"=="A" goto ADDITIONAL_TWEAKS
 if /i "%choice%"=="R" goto REDOWNLOAD
@@ -1134,20 +1135,18 @@ color 0F
 echo     CPU OPTIMIZATION (%CPU_TYPE%)
 echo.
 echo     [1] Applying TGP (Ultimate Performance)
-echo     [2] Applying TGE (Energy Saving Mode)
-if "%CPU_TYPE%"=="AMD" echo     [3] AMD CPU Boost Optimization
-echo     [4] Set CPU and Network Priority for Gaming
-echo     [5] Revert CPU and Network Priority to Default
+echo     [2] Set CPU and Network Priority for Gaming
+echo     [3] Revert CPU and Network Priority to Default
+if "%CPU_TYPE%"=="AMD" echo     [A] AMD CPU Boost Optimization
 echo     [R] Revert All CPU Settings to Default
 echo     [B] Back to Main Menu
 echo.
 set /p cpu_choice="Select option: "
 
 if "%cpu_choice%"=="1" goto SMART_POWER_PLAN
-if "%cpu_choice%"=="2" goto ENERGY_SAVING_PLAN
-if "%cpu_choice%"=="3" if "%CPU_TYPE%"=="AMD" goto CPU_AMD_BOOST
-if "%cpu_choice%"=="4" goto CPU_NET_PRIORITY_ON
-if "%cpu_choice%"=="5" goto CPU_NET_PRIORITY_OFF
+if /i "%cpu_choice%"=="A" if "%CPU_TYPE%"=="AMD" goto CPU_AMD_BOOST
+if "%cpu_choice%"=="2" goto CPU_NET_PRIORITY_ON
+if "%cpu_choice%"=="3" goto CPU_NET_PRIORITY_OFF
 if /i "%cpu_choice%"=="R" goto CPU_REVERT
 if /i "%cpu_choice%"=="B" goto MAIN_MENU
 
@@ -1199,57 +1198,6 @@ if %errorlevel%==0 (
     powercfg -duplicatescheme 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
     powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
     echo     [SUCCESS] High Performance Activated.
-    echo     Back to CPU Optimization menu...
-    timeout /t 3 >nul
-    goto CPU_MENU
-)
-
-echo     Back to CPU Optimization menu...
-timeout /t 3 >nul
-goto CPU_MENU
-
-:: ==============================================================
-:: TGE (TECH GAMEPLAY ENERGY SAVING)
-:: ==============================================================
-:ENERGY_SAVING_PLAN
-call :PRINT_HEADER
-color 0E
-echo     Importing TGE...
-echo.
-
-:: check if file exists
-if not exist "C:\TGO\TGE.pow" (
-    call :PRINT_HEADER
-    color 0C
-    echo     [FAILED] TGE.pow not found in C:\TGO\
-    echo     Please ensure the download was successful.
-    pause
-    goto CPU_MENU
-)
-
-powercfg -import "C:\TGO\TGE.pow" 11111111-1111-1111-1111-111111111111 >nul 2>&1
-powercfg -setactive 11111111-1111-1111-1111-111111111111 >nul 2>&1
-
-:: check if activated
-powercfg /getactivescheme | find "11111111-1111-1111-1111-111111111111" >nul
-if %errorlevel%==0 (
-    call :WRITE_LOG "TGE Energy Saving power plan activated"
-    call :PRINT_HEADER
-    color 0A
-    echo     ─────────────────────────────────────
-    echo     [SUCCESS] TGE ENERGY SAVER ACTIVATED!
-    echo     ─────────────────────────────────────
-    echo.
-    echo     Back to CPU Optimization menu...
-    timeout /t 3 >nul
-    goto CPU_MENU
-) else (
-    call :WRITE_LOG "Default power plan activated"
-    call :PRINT_HEADER
-    color 0C
-    echo     [WARNING] Failed to activate TGE.
-    echo     Reverting to default power schemes...
-    powercfg -restoredefaultschemes
     echo     Back to CPU Optimization menu...
     timeout /t 3 >nul
     goto CPU_MENU
@@ -1698,16 +1646,20 @@ call :PRINT_HEADER
 color 0F
 echo     CHANGELOG
 echo.
+echo     [v2.1.0]
+echo       + Added Services Optimization Menu.
+echo       + Updated TGP Power Plan for better performance. (redownload all the resources first)
+echo.
 echo     [v2.0.1]
 echo       + Fixed Storage Type Detection for some models.
 echo.
 echo     [v2.0.0]
-echo       + Completely redesigned clean and modern UI
-echo       + Auto-detect RAM size and Storage type (SSD/HDD)
-echo       + Improved hardware detection accuracy
-echo       + Optimization logging system (C:\TGO\logs\TGO_Log.txt)
-echo       + Better organized menus with clear recommendations
-echo       + Premium visual experience with consistent styling
+echo       + Completely redesigned clean and modern UI.
+echo       + Auto-detect RAM size and Storage type. (SSD/HDD)
+echo       + Improved hardware detection accuracy.
+echo       + Optimization logging system. (C:\TGO\logs\TGO_Log.txt)
+echo       + Better organized menus with clear recommendations.
+echo       + Premium visual experience with consistent styling.
 echo       + And much more...
 echo.
 echo     [v1.5.6]
@@ -1803,34 +1755,31 @@ if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Wind
 if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
 if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
 
-echo     [1/10] Downloading.
+echo     [1/9] Downloading.
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
 echo.
-echo     [2/10] Downloading..
+echo     [2/9] Downloading..
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
 echo.
-echo     [3/10] Downloading...
+echo     [3/9] Downloading...
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
 echo.
-echo     [4/10] Downloading....
+echo     [4/9] Downloading....
 curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
 echo.
-echo     [5/10] Downloading.....
+echo     [5/9] Downloading.....
 curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
 echo.
-echo     [6/10] Downloading......
+echo     [6/9] Downloading......
 curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
 echo.
-echo     [7/10] Downloading.......
+echo     [7/9] Downloading.......
 curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
 echo.
-echo     [8/10] Downloading........
-curl -g -k -L -# -o "C:\TGO\TGE.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGE.pow" >nul 2>&1  
-echo.
-echo     [9/10] Downloading.........
+echo     [8/9] Downloading........
 curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
 echo.
-echo     [10/10] Downloading..........
+echo     [9/9] Downloading.........
 curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
 
 echo.
@@ -1850,34 +1799,31 @@ if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Wind
 if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
 if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
 
-echo     [1/10] Downloading.
+echo     [1/9] Downloading.
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
 echo.
-echo     [2/10] Downloading..
+echo     [2/9] Downloading..
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
 echo.
-echo     [3/10] Downloading...
+echo     [3/9] Downloading...
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
 echo.
-echo     [4/10] Downloading....
+echo     [4/9] Downloading....
 curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
 echo.
-echo     [5/10] Downloading.....
+echo     [5/9] Downloading.....
 curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
 echo.
-echo     [6/10] Downloading......
+echo     [6/9] Downloading......
 curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
 echo.
-echo     [7/10] Downloading.......
+echo     [7/9] Downloading.......
 curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
 echo.
-echo     [8/10] Downloading........
-curl -g -k -L -# -o "C:\TGO\TGE.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGE.pow" >nul 2>&1  
-echo.
-echo     [9/10] Downloading.........
+echo     [8/9] Downloading........
 curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
 echo.
-echo     [10/10] Downloading..........
+echo     [9/9] Downloading.........
 curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
 
 echo.
@@ -2156,6 +2102,331 @@ if %errorlevel% equ 0 (
 )
 timeout /t 3 >nul
 goto VISUAL_EFFECTS_MENU
+
+:: ============================================================================
+:: SERVICES OPTIMIZATION
+:: ============================================================================
+:SERVICES_OPTIMIZATION_MENU
+title Services Optimization
+call :PRINT_HEADER
+color 0F
+echo     SERVICES OPTIMIZATION
+echo.
+echo     [1]  Basic Optimization     (Safe for everyone)
+echo     [2]  Standard Optimization  (Recommended for gamers)
+echo     [3]  Advanced Optimization  (Extreme Tweaks - Read Info first)
+echo     [4]  Revert to Default
+echo.
+echo     [I]  Mode Info ^& Explanation
+echo     [B]  Back to Main Menu
+echo.
+set /p svcchoice="Select option: "
+
+if "%svcchoice%"=="1" goto SERVICES_BASIC
+if "%svcchoice%"=="2" goto SERVICES_STANDARD
+if "%svcchoice%"=="3" goto SERVICES_ADVANCED
+if "%svcchoice%"=="4" goto SERVICES_REVERT
+if /i "%svcchoice%"=="I" goto SERVICES_INFO
+if /i "%svcchoice%"=="B" goto MAIN_MENU
+
+echo Invalid selection
+echo Press any key to continue...
+pause >nul
+goto SERVICES_OPTIMIZATION_MENU
+
+:SERVICES_INFO
+call :PRINT_HEADER
+color 0F
+echo     MODE INFO ^& EXPLANATION SERVICES OPTIMIZATION
+echo.
+echo     Basic Mode: (Safe for everyone)
+echo     - Disables Telemetry, Tracking, and Microsoft Diagnostics.
+echo     - Disables Bloatware services (RetailDemo, WAP Push).
+echo     - Useful for reducing background processes without damaging important features.
+echo.
+echo     Standard Mode: (Recommended for gamers)
+echo     - Includes all Basic Mode features.
+echo     - Disables rarely used services: Print Spooler (printer), Offline 
+echo       Files, Remote Registry, and Superfetch (highly recommended if 
+echo       using SSD).
+echo     - Disables Windows Notifications (Toast/Push) and Messaging.
+echo     - Info: If you need to print or see notifications, use Revert mode later.
+echo.
+echo     Advanced Mode: (EXTREME - Use at your own risk)
+echo     - Includes all Standard Mode features.
+echo     - Disables Windows Update, Windows Defender (Security), Xbox Services,
+echo       and several other services.
+echo     - Info: NOT RECOMMENDED for daily use because it is very vulnerable
+echo       to viruses and cannot install games from Microsoft Store/Xbox.
+echo.
+echo     Revert to Default:
+echo     - Restore all disabled services to their original Windows settings.
+echo     - Use this if any features suddenly stop working.
+echo.
+echo     Press any key to go back...
+pause >nul
+goto SERVICES_OPTIMIZATION_MENU
+
+:SERVICES_BASIC
+call :PRINT_HEADER
+color 0E
+echo     Applying Basic Services Optimization...
+echo     Please wait...
+echo.
+sc stop DoSvc > nul 2>&1
+sc config DoSvc start= disabled > nul 2>&1
+sc stop diagsvc > nul 2>&1
+sc config diagsvc start= disabled > nul 2>&1
+sc stop DPS > nul 2>&1
+sc config DPS start= disabled > nul 2>&1
+sc stop dmwappushservice > nul 2>&1
+sc config dmwappushservice start= disabled > nul 2>&1
+sc stop MapsBroker > nul 2>&1
+sc config MapsBroker start= disabled > nul 2>&1
+sc stop RetailDemo > nul 2>&1
+sc config RetailDemo start= disabled > nul 2>&1
+sc stop WdiServiceHost > nul 2>&1
+sc config WdiServiceHost start= disabled > nul 2>&1
+sc stop WdiSystemHost > nul 2>&1
+sc config WdiSystemHost start= disabled > nul 2>&1
+sc stop DiagTrack > nul 2>&1
+sc config DiagTrack start= disabled > nul 2>&1
+
+call :WRITE_LOG "Applied Basic Services Optimization"
+color 0A
+echo     [SUCCESS] Basic Optimization Applied!
+timeout /t 3 >nul
+goto SERVICES_OPTIMIZATION_MENU
+
+:SERVICES_STANDARD
+call :PRINT_HEADER
+color 0E
+echo     Applying Standard Services Optimization...
+echo     Please wait...
+echo.
+:: Apply Basic first
+sc stop DoSvc > nul 2>&1
+sc config DoSvc start= disabled > nul 2>&1
+sc stop diagsvc > nul 2>&1
+sc config diagsvc start= disabled > nul 2>&1
+sc stop DPS > nul 2>&1
+sc config DPS start= disabled > nul 2>&1
+sc stop dmwappushservice > nul 2>&1
+sc config dmwappushservice start= disabled > nul 2>&1
+sc stop MapsBroker > nul 2>&1
+sc config MapsBroker start= disabled > nul 2>&1
+sc stop RetailDemo > nul 2>&1
+sc config RetailDemo start= disabled > nul 2>&1
+sc stop WdiServiceHost > nul 2>&1
+sc config WdiServiceHost start= disabled > nul 2>&1
+sc stop WdiSystemHost > nul 2>&1
+sc config WdiSystemHost start= disabled > nul 2>&1
+sc stop DiagTrack > nul 2>&1
+sc config DiagTrack start= disabled > nul 2>&1
+
+:: Standard specific
+sc stop Spooler > nul 2>&1
+sc config Spooler start= disabled > nul 2>&1
+sc stop fhsvc > nul 2>&1
+sc config fhsvc start= disabled > nul 2>&1
+sc stop RemoteRegistry > nul 2>&1
+sc config RemoteRegistry start= disabled > nul 2>&1
+sc stop TrkWks > nul 2>&1
+sc config TrkWks start= disabled > nul 2>&1
+sc stop SysMain > nul 2>&1
+sc config SysMain start= disabled > nul 2>&1
+sc stop lfsvc > nul 2>&1
+sc config lfsvc start= disabled > nul 2>&1
+sc stop CscService > nul 2>&1
+sc config CscService start= disabled > nul 2>&1
+sc stop PhoneSvc > nul 2>&1
+sc config PhoneSvc start= disabled > nul 2>&1
+sc stop WalletService > nul 2>&1
+sc config WalletService start= disabled > nul 2>&1
+sc stop TermService > nul 2>&1
+sc config TermService start= disabled > nul 2>&1
+sc stop SessionEnv > nul 2>&1
+sc config SessionEnv start= disabled > nul 2>&1
+sc stop UmRdpService > nul 2>&1
+sc config UmRdpService start= disabled > nul 2>&1
+
+:: Disable User Services via Registry (Basic + Standard)
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MessagingService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WpnUserService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BcastDVRUserService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+
+call :WRITE_LOG "Applied Standard Services Optimization"
+color 0A
+echo     [SUCCESS] Standard Optimization Applied!
+timeout /t 3 >nul
+goto SERVICES_OPTIMIZATION_MENU
+
+:SERVICES_ADVANCED
+call :PRINT_HEADER
+color 0C
+echo     [WARNING] Applying Advanced Services Optimization...
+echo     This will disable Windows Update and Windows Defender!
+echo     Please wait...
+echo.
+:: Apply Standard first
+sc stop DoSvc > nul 2>&1
+sc config DoSvc start= disabled > nul 2>&1
+sc stop diagsvc > nul 2>&1
+sc config diagsvc start= disabled > nul 2>&1
+sc stop DPS > nul 2>&1
+sc config DPS start= disabled > nul 2>&1
+sc stop dmwappushservice > nul 2>&1
+sc config dmwappushservice start= disabled > nul 2>&1
+sc stop MapsBroker > nul 2>&1
+sc config MapsBroker start= disabled > nul 2>&1
+sc stop RetailDemo > nul 2>&1
+sc config RetailDemo start= disabled > nul 2>&1
+sc stop WdiServiceHost > nul 2>&1
+sc config WdiServiceHost start= disabled > nul 2>&1
+sc stop WdiSystemHost > nul 2>&1
+sc config WdiSystemHost start= disabled > nul 2>&1
+sc stop DiagTrack > nul 2>&1
+sc config DiagTrack start= disabled > nul 2>&1
+sc stop Spooler > nul 2>&1
+sc config Spooler start= disabled > nul 2>&1
+sc stop fhsvc > nul 2>&1
+sc config fhsvc start= disabled > nul 2>&1
+sc stop RemoteRegistry > nul 2>&1
+sc config RemoteRegistry start= disabled > nul 2>&1
+sc stop TrkWks > nul 2>&1
+sc config TrkWks start= disabled > nul 2>&1
+sc stop SysMain > nul 2>&1
+sc config SysMain start= disabled > nul 2>&1
+sc stop lfsvc > nul 2>&1
+sc config lfsvc start= disabled > nul 2>&1
+sc stop CscService > nul 2>&1
+sc config CscService start= disabled > nul 2>&1
+sc stop PhoneSvc > nul 2>&1
+sc config PhoneSvc start= disabled > nul 2>&1
+sc stop WalletService > nul 2>&1
+sc config WalletService start= disabled > nul 2>&1
+sc stop TermService > nul 2>&1
+sc config TermService start= disabled > nul 2>&1
+sc stop SessionEnv > nul 2>&1
+sc config SessionEnv start= disabled > nul 2>&1
+sc stop UmRdpService > nul 2>&1
+sc config UmRdpService start= disabled > nul 2>&1
+
+:: Advanced specific
+sc stop wuauserv > nul 2>&1
+sc config wuauserv start= disabled > nul 2>&1
+sc stop UsoSvc > nul 2>&1
+sc config UsoSvc start= disabled > nul 2>&1
+sc stop BITS > nul 2>&1
+sc config BITS start= disabled > nul 2>&1
+sc stop WaaSMedicSvc > nul 2>&1
+sc config WaaSMedicSvc start= disabled > nul 2>&1
+sc stop WinDefend > nul 2>&1
+sc config WinDefend start= disabled > nul 2>&1
+sc stop wscsvc > nul 2>&1
+sc config wscsvc start= disabled > nul 2>&1
+sc stop Sense > nul 2>&1
+sc config Sense start= disabled > nul 2>&1
+sc stop WdNisSvc > nul 2>&1
+sc config WdNisSvc start= disabled > nul 2>&1
+sc stop wmiApSrv > nul 2>&1
+sc config wmiApSrv start= disabled > nul 2>&1
+sc stop XboxGipSvc > nul 2>&1
+sc config XboxGipSvc start= disabled > nul 2>&1
+sc stop xbgm > nul 2>&1
+sc config xbgm start= disabled > nul 2>&1
+sc stop XblAuthManager > nul 2>&1
+sc config XblAuthManager start= disabled > nul 2>&1
+sc stop XblGameSave > nul 2>&1
+sc config XblGameSave start= disabled > nul 2>&1
+sc stop XboxNetApiSvc > nul 2>&1
+sc config XboxNetApiSvc start= disabled > nul 2>&1
+
+:: Disable User Services via Registry (Basic + Standard + Advanced)
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MessagingService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WpnUserService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BcastDVRUserService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CDPUserSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CaptureService" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ConsentUxUserSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PimIndexMaintenanceSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DevicePickerUserSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DevicesFlowUserSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PrintWorkflowUserSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\OneSyncSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UserDataSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UnistoreSvc" /v Start /t REG_DWORD /d 4 /f > nul 2>&1
+
+call :WRITE_LOG "Applied Advanced Services Optimization"
+color 0A
+echo     [SUCCESS] Advanced Optimization Applied!
+timeout /t 3 >nul
+goto SERVICES_OPTIMIZATION_MENU
+
+:SERVICES_REVERT
+call :PRINT_HEADER
+color 0E
+echo     Reverting Services to Default...
+echo     Please wait...
+echo.
+sc config DoSvc start= delayed-auto > nul 2>&1
+sc config diagsvc start= demand > nul 2>&1
+sc config DPS start= auto > nul 2>&1
+sc config dmwappushservice start= demand > nul 2>&1
+sc config MapsBroker start= delayed-auto > nul 2>&1
+sc config RetailDemo start= demand > nul 2>&1
+sc config WdiServiceHost start= demand > nul 2>&1
+sc config WdiSystemHost start= demand > nul 2>&1
+sc config DiagTrack start= auto > nul 2>&1
+sc config Spooler start= auto > nul 2>&1
+sc config fhsvc start= demand > nul 2>&1
+sc config RemoteRegistry start= disabled > nul 2>&1
+sc config TrkWks start= auto > nul 2>&1
+sc config SysMain start= auto > nul 2>&1
+sc config lfsvc start= demand > nul 2>&1
+sc config CscService start= demand > nul 2>&1
+sc config PhoneSvc start= demand > nul 2>&1
+sc config WalletService start= demand > nul 2>&1
+sc config TermService start= demand > nul 2>&1
+sc config SessionEnv start= demand > nul 2>&1
+sc config UmRdpService > nul 2>&1
+sc config wuauserv start= demand > nul 2>&1
+sc config UsoSvc start= delayed-auto > nul 2>&1
+sc config BITS start= delayed-auto > nul 2>&1
+sc config WaaSMedicSvc start= demand > nul 2>&1
+sc config WinDefend start= auto > nul 2>&1
+sc config wscsvc start= delayed-auto > nul 2>&1
+sc config Sense start= demand > nul 2>&1
+sc config WdNisSvc start= demand > nul 2>&1
+sc config wmiApSrv start= demand > nul 2>&1
+sc config XboxGipSvc start= demand > nul 2>&1
+sc config xbgm start= demand > nul 2>&1
+sc config XblAuthManager start= demand > nul 2>&1
+sc config XblGameSave start= demand > nul 2>&1
+sc config XboxNetApiSvc start= demand > nul 2>&1
+
+:: Revert User Services via Registry
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MessagingService" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WpnUserService" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BcastDVRUserService" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CDPUserSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CaptureService" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ConsentUxUserSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PimIndexMaintenanceSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DevicePickerUserSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DevicesFlowUserSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PrintWorkflowUserSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\OneSyncSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UserDataSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UnistoreSvc" /v Start /t REG_DWORD /d 2 /f > nul 2>&1
+
+call :WRITE_LOG "Reverted Services Optimization to Default"
+color 0A
+echo     [SUCCESS] Services Reverted to Default!
+timeout /t 3 >nul
+goto SERVICES_OPTIMIZATION_MENU
 
 :: ============================================================================
 :: END OF SCRIPT
