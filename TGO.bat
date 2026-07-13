@@ -223,7 +223,7 @@ echo                        ██║   ╚██████╔╝╚███�
 echo                        ╚═╝    ╚═════╝  ╚═════╝ 
 echo.
 color 0F
-echo                    Tech Gameplay Optimizer  v2.1.0
+echo                    Tech Gameplay Optimizer  v2.2.0
 echo     ──────────────────────────────────────────────────────────────
 echo     •  OS: %OS_NAME%
 echo     •  CPU: %CPU_MODEL%
@@ -236,7 +236,7 @@ goto :eof
 
 :MAIN_MENU
 call :PRINT_HEADER
-title TGO v2.1.0
+title TGO v2.2.0
 color 0F
 echo     MAIN MENU
 echo.
@@ -252,6 +252,7 @@ echo     [9]  Services Optimization
 echo.
 echo     [0]  System Restore and Recovery
 echo     [A]  Additional Tools and Tweaks
+echo     [B]  Windows Apps Debloater
 echo.
 echo     [R]  Redownload All Resources
 echo     [L]  View Optimization Log
@@ -271,6 +272,7 @@ if "%choice%"=="8" goto GPU_MENU
 if "%choice%"=="9" goto SERVICES_OPTIMIZATION_MENU
 if "%choice%"=="0" goto SYSTEM_RESTORE_MENU
 if /i "%choice%"=="A" goto ADDITIONAL_TWEAKS
+if /i "%choice%"=="B" goto BLOATWARE_MENU
 if /i "%choice%"=="R" goto REDOWNLOAD
 if /i "%choice%"=="L" goto VIEW_LOG
 if /i "%choice%"=="C" goto CHANGELOG
@@ -280,6 +282,220 @@ echo Invalid selection
 echo Press any key to continue...
 pause >nul
 goto MAIN_MENU
+
+:: ============================================================================
+:: WINDOWS APPS DEBLOATER
+:: ============================================================================
+:BLOATWARE_MENU
+title Windows Apps Debloater
+call :PRINT_HEADER
+color 0F
+echo     WINDOWS APPS DEBLOATER
+echo.
+echo     [1]  Remove All Windows Bloatware
+echo     [2]  Remove Specific Windows Bloatware
+echo     [3]  Restore All Windows Bloatware
+echo     [4]  Restore Specific Windows Bloatware
+echo     [5]  Advanced Manual Removal
+echo     [6]  Remove Microsoft Edge
+echo     [7]  Restore Microsoft Edge
+echo     [B]  Back to Main Menu
+echo.
+set /p bw_choice="Select option: "
+if "%bw_choice%"=="1" goto DEBLOAT_ALL
+if "%bw_choice%"=="2" goto DEBLOAT_INTERACTIVE
+if "%bw_choice%"=="3" goto DEBLOAT_RESTORE_ALL
+if "%bw_choice%"=="4" goto DEBLOAT_RESTORE_INTERACTIVE
+if "%bw_choice%"=="5" goto DEBLOAT_MANUAL
+if "%bw_choice%"=="6" goto EDGE_REMOVE
+if "%bw_choice%"=="7" goto EDGE_RESTORE
+if /i "%bw_choice%"=="B" goto MAIN_MENU
+
+echo Invalid selection
+echo Press any key to continue...
+pause >nul
+goto BLOATWARE_MENU
+
+:DEBLOAT_ALL
+call :PRINT_HEADER
+color 0E
+echo     Removing All Windows Bloatware...
+echo     Please wait, this might take a while...
+echo.
+set "apps=Microsoft.3DBuilder Microsoft.Print3D Microsoft.Microsoft3DViewer Microsoft.WindowsAlarms Microsoft.BingNews Microsoft.WindowsCalculator Microsoft.WindowsCamera Microsoft.549981C3F5F10 Microsoft.WindowsFeedbackHub Microsoft.GetHelp Microsoft.Getstarted Microsoft.WindowsMaps Microsoft.Messaging Microsoft.MicrosoftOfficeHub Microsoft.Office.Sway Microsoft.Office.Desktop microsoft.windowscommunicationsapps Microsoft.MixedReality.Portal Microsoft.Wallet Microsoft.People Microsoft.Office.OneNote Microsoft.ScreenSketch Microsoft.MicrosoftSolitaireCollection Microsoft.MicrosoftStickyNotes Microsoft.StorePurchaseApp Microsoft.ZuneMusic Microsoft.Windows.Photos Microsoft.RemoteDesktop Microsoft.WindowsSoundRecorder Microsoft.BingWeather Microsoft.XboxApp Microsoft.XboxGamingOverlay Microsoft.Xbox.TCUI Microsoft.XboxGameOverlay Microsoft.XboxIdentityProvider Microsoft.XboxSpeechToTextOverlay Microsoft.YourPhone Microsoft.MSPaint AppUp.IntelGraphicsControlPanel RealtekSemiconductorCorp.RealtekAudioControl Twitter Spotify Microsoft.NetworkSpeedTest Mirkat.Mirkat 7EE7776C.LinkedInforWindows Flipboard Facebook Duolingo-LearnLanguagesforFree CandyCrush AdobeSystemsIncorporated.AdobePhotoshopExpress"
+
+for %%A in (%apps%) do (
+    echo     Removing %%A...
+    PowerShell -NoProfile -Command "Get-AppxPackage -allusers *%%A* | Remove-AppxPackage -ErrorAction SilentlyContinue" >nul 2>&1
+)
+:: Handle Cortana & Copilot special case
+PowerShell -NoProfile -Command "Get-AppxPackage Microsoft.Windows.Ai.Copilot.Provider | Remove-AppxPackage -ErrorAction SilentlyContinue" >nul 2>&1
+
+call :WRITE_LOG "All-in-One Debloat executed."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] All common bloatware removed.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:DEBLOAT_INTERACTIVE
+call :PRINT_HEADER
+color 0E
+echo     INTERACTIVE DEBLOAT
+echo     Answer Y to remove, N to skip.
+echo.
+set "apps=Microsoft.3DBuilder:3D_Builder Microsoft.Print3D:3D_Print Microsoft.Microsoft3DViewer:3D_Viewer Microsoft.WindowsAlarms:Alarms Microsoft.BingNews:Bing_News Microsoft.WindowsCalculator:Calculator Microsoft.WindowsCamera:Camera Microsoft.549981C3F5F10:Cortana Microsoft.WindowsFeedbackHub:Feedback_Hub Microsoft.GetHelp:Get_Help Microsoft.Getstarted:Get_Started Microsoft.WindowsMaps:Maps Microsoft.Messaging:Messaging Microsoft.MicrosoftOfficeHub:Office_Hub microsoft.windowscommunicationsapps:Mail_and_Calendar Microsoft.MixedReality.Portal:Mixed_Reality Microsoft.Wallet:Microsoft_Pay Microsoft.People:People Microsoft.Office.OneNote:OneNote Microsoft.ScreenSketch:Snip_and_Sketch Microsoft.MicrosoftSolitaireCollection:Solitaire Microsoft.MicrosoftStickyNotes:Sticky_Notes Microsoft.StorePurchaseApp:Store_Purchase Microsoft.ZuneMusic:Zune_Music Microsoft.Windows.Photos:Photos Microsoft.RemoteDesktop:Remote_Desktop Microsoft.WindowsSoundRecorder:Sound_Recorder Microsoft.BingWeather:Weather Microsoft.XboxApp:Xbox Microsoft.YourPhone:Your_Phone Microsoft.MSPaint:MS_Paint Spotify:Spotify Twitter:Twitter Facebook:Facebook CandyCrush:Candy_Crush"
+
+for /f %%a in ('"prompt $H & echo on & for %%b in (1) do rem"') do set "BS=%%a"
+for /f %%a in ('"prompt $E$S & echo on & for %%b in (1) do rem"') do set "ESC=%%a"
+for %%A in (%apps%) do call :DEBLOAT_INTERACTIVE_ITEM "%%A"
+
+call :WRITE_LOG "Interactive Debloat executed."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] Interactive Debloat Finished.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:DEBLOAT_RESTORE_ALL
+call :PRINT_HEADER
+color 0E
+echo     RESTORE ALL BLOATWARE (ALL-IN-ONE)
+echo.
+echo     Restoring all apps... This takes a while.
+PowerShell -NoProfile -Command "Get-AppxPackage -allusers | foreach {Add-AppxPackage -register \"$($_.InstallLocation)\appxmanifest.xml\" -DisabledevelopmentMode}" >nul 2>&1
+call :WRITE_LOG "Restored all bloatware apps."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] Restored all apps.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:DEBLOAT_RESTORE_INTERACTIVE
+call :PRINT_HEADER
+color 0E
+echo     RESTORE SPECIFIC BLOATWARE
+echo     Answer Y to remove, N to skip.
+echo.
+set "apps=Microsoft.3DBuilder:3D_Builder Microsoft.Print3D:3D_Print Microsoft.Microsoft3DViewer:3D_Viewer Microsoft.WindowsAlarms:Alarms Microsoft.BingNews:Bing_News Microsoft.WindowsCalculator:Calculator Microsoft.WindowsCamera:Camera Microsoft.549981C3F5F10:Cortana Microsoft.WindowsFeedbackHub:Feedback_Hub Microsoft.GetHelp:Get_Help Microsoft.Getstarted:Get_Started Microsoft.WindowsMaps:Maps Microsoft.Messaging:Messaging Microsoft.MicrosoftOfficeHub:Office_Hub microsoft.windowscommunicationsapps:Mail_and_Calendar Microsoft.MixedReality.Portal:Mixed_Reality Microsoft.Wallet:Microsoft_Pay Microsoft.People:People Microsoft.Office.OneNote:OneNote Microsoft.ScreenSketch:Snip_and_Sketch Microsoft.MicrosoftSolitaireCollection:Solitaire Microsoft.MicrosoftStickyNotes:Sticky_Notes Microsoft.StorePurchaseApp:Store_Purchase Microsoft.ZuneMusic:Zune_Music Microsoft.Windows.Photos:Photos Microsoft.RemoteDesktop:Remote_Desktop Microsoft.WindowsSoundRecorder:Sound_Recorder Microsoft.BingWeather:Weather Microsoft.XboxApp:Xbox Microsoft.YourPhone:Your_Phone Microsoft.MSPaint:MS_Paint Spotify:Spotify Twitter:Twitter Facebook:Facebook CandyCrush:Candy_Crush"
+for /f %%a in ('"prompt $H & echo on & for %%b in (1) do rem"') do set "BS=%%a"
+for /f %%a in ('"prompt $E$S & echo on & for %%b in (1) do rem"') do set "ESC=%%a"
+for %%A in (%apps%) do call :DEBLOAT_RESTORE_ITEM "%%A"
+call :WRITE_LOG "Restored specific bloatware apps."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] Restored specific apps.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:EDGE_REMOVE
+call :PRINT_HEADER
+color 0C
+echo     REMOVE MICROSOFT EDGE
+echo.
+echo     WARNING: This will permanently remove the Edge Browser.
+echo     (Edge WebView2 will be kept safe to prevent system breakage).
+echo.
+set /p confirm="Are you sure you want to remove Edge? (Y/N): "
+if /i "%confirm%" neq "Y" goto BLOATWARE_MENU
+
+echo.
+echo     Removing Microsoft Edge...
+taskkill /f /im msedge.exe >nul 2>&1
+taskkill /f /im msedge.exe /fi "IMAGENAME eq msedge.exe" >nul 2>&1
+rd /s /q "%ProgramFiles(x86)%\Microsoft\Edge" >nul 2>&1
+rd /s /q "%ProgramFiles(x86)%\Microsoft\EdgeCore" >nul 2>&1
+rd /s /q "%ProgramFiles(x86)%\Microsoft\EdgeUpdate" >nul 2>&1
+:: EdgeWebView is intentionally NOT deleted here to preserve system stability
+rd /s /q "%LocalAppData%\Microsoft\Edge" >nul 2>&1
+rd /s /q "%ProgramFiles(x86)%\Microsoft\Temp" >nul 2>&1
+del "C:\Users\Public\Desktop\Microsoft Edge.lnk" >nul 2>&1
+del "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" >nul 2>&1
+del "%APPDATA%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Microsoft Edge.lnk" >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /t REG_DWORD /d 1 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v InstallDefault /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v UpdateDefault /t REG_DWORD /d 0 /f >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateBrowserReplacementTask" /DISABLE >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateTaskMachineCore" /DISABLE >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateTaskMachineUA" /DISABLE >nul 2>&1
+sc stop EdgeUpdate >nul 2>&1
+sc config EdgeUpdate start= disabled >nul 2>&1
+icacls "%ProgramFiles(x86)%\Microsoft\Edge" /deny *S-1-1-0:(F) /t >nul 2>&1
+
+call :WRITE_LOG "Microsoft Edge removed."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] Microsoft Edge has been removed.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:EDGE_RESTORE
+call :PRINT_HEADER
+color 0E
+echo     RESTORE MICROSOFT EDGE
+echo.
+echo     Restoring Edge via winget...
+reg delete "HKLM\SOFTWARE\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /f >nul 2>&1
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v InstallDefault /f >nul 2>&1
+reg delete "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v UpdateDefault /f >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateBrowserReplacementTask" /ENABLE >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateTaskMachineCore" /ENABLE >nul 2>&1
+schtasks /Change /TN "MicrosoftEdgeUpdateTaskMachineUA" /ENABLE >nul 2>&1
+icacls "%ProgramFiles(x86)%\Microsoft\Edge" /remove:d *S-1-1-0 /t >nul 2>&1
+powershell -NoProfile -Command "Start-Process winget -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent Microsoft.Edge' -Wait" >nul 2>&1
+icacls "%ProgramFiles(x86)%\Microsoft\Edge" /remove:d *S-1-1-0 /t >nul 2>&1
+
+call :WRITE_LOG "Microsoft Edge restored."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] Microsoft Edge restoration completed/initiated.
+echo.
+echo     Back to Windows Apps Debloater menu...
+timeout /t 3 >nul
+goto BLOATWARE_MENU
+
+:DEBLOAT_MANUAL
+call :PRINT_HEADER
+color 0E
+echo     MANUAL DEBLOAT
+echo.
+echo     Delete Apps Guide
+echo.
+echo     1. geek will be launched shortly...
+echo     2. Inside geek, click on the 'View' menu at the top.
+echo     3. Select 'Microsoft Store Apps' from the dropdown.
+echo     4. Right-click on the apps you want to remove and choose 'Uninstall'.
+echo     5. After you are done, CLOSE geek to finish this step.
+if exist "C:\TGO\geek.exe" (
+    start /wait "" "C:\TGO\geek.exe"
+) else (
+    echo     Geek Uninstaller not found in C:\TGO\geek.exe.
+    echo     Please download resources first via Main Menu [R].
+)
+call :WRITE_LOG "Manual Debloat Completed."
+call :PRINT_HEADER
+color 0A
+echo.
+echo     [SUCCESS] geek has been closed. Returning to menu...
+echo.
+timeout /t 3 >nul
+goto BLOATWARE_MENU
 
 :: ============================================================================
 :: VIEW LOG
@@ -1642,9 +1858,18 @@ goto GPU_MENU
 :: ============================================================================
 :CHANGELOG
 title Changelog
-call :PRINT_HEADER
+cls
+color 0B
+echo.
+echo.
+echo     [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
+echo     ──────────────────────────────────────────────────────────────
 color 0F
-echo     CHANGELOG
+echo.
+echo     [v2.2.0]
+echo       + Added Windows Apps Debloater Menu.
+echo       + Integrated automatic and interactive bloatware removal.
+echo       + Added safe Microsoft Edge removal.
 echo.
 echo     [v2.1.0]
 echo       + Added Services Optimization Menu.
@@ -1686,6 +1911,8 @@ echo       + Minor fixes and stability improvements.
 echo.
 echo     [v1.0.0]
 echo       + Initial Release of Tech Gameplay Optimizer (TGO)
+echo.
+echo     ──────────────────────────────────────────────────────────────
 echo.
 echo Press any key to continue...
 pause >nul
@@ -2437,4 +2664,48 @@ goto :eof
 if not exist "C:\TGO" mkdir "C:\TGO" >nul 2>&1
 if not exist "C:\TGO\logs" mkdir "C:\TGO\logs" >nul 2>&1
 echo [%date% %time:~0,8%] - %* >> "C:\TGO\logs\TGO_Log.txt"
+goto :eof
+
+:DEBLOAT_INTERACTIVE_ITEM
+:: %1 = "PackageName:FriendlyName"
+set "_pair=%~1"
+for /f "tokens=1,2 delims=:" %%G in ("%_pair%") do (
+    set "_pkg=%%G"
+    set "_name=%%H"
+)
+:PROMPT_REMOVE
+set "rm="
+<nul set /p "=.%BS%    Delete %_name%? (Y/N): "
+set /p "rm="
+if /i "%rm%"=="N" goto :eof
+if /i "%rm%"=="Y" goto DO_REMOVE
+
+<nul set /p "=%ESC%[1A%ESC%[2K"
+goto PROMPT_REMOVE
+
+:DO_REMOVE
+echo     Removing %_name%...
+PowerShell -NoProfile -Command "Get-AppxPackage -allusers *%_pkg%* | Remove-AppxPackage -ErrorAction SilentlyContinue" >nul 2>&1
+goto :eof
+
+:DEBLOAT_RESTORE_ITEM
+:: %1 = "PackageName:FriendlyName"
+set "_pair=%~1"
+for /f "tokens=1,2 delims=:" %%G in ("%_pair%") do (
+    set "_pkg=%%G"
+    set "_name=%%H"
+)
+:PROMPT_RESTORE
+set "rm="
+<nul set /p "=.%BS%    Restore %_name%? (Y/N): "
+set /p "rm="
+if /i "%rm%"=="N" goto :eof
+if /i "%rm%"=="Y" goto DO_RESTORE
+
+<nul set /p "=%ESC%[1A%ESC%[2K"
+goto PROMPT_RESTORE
+
+:DO_RESTORE
+echo     Restoring %_name%...
+PowerShell -NoProfile -Command "Get-AppxPackage -AllUsers *%_pkg%* | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register \"$($_.InstallLocation)\AppXManifest.xml\"}" >nul 2>&1
 goto :eof
