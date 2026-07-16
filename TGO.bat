@@ -223,7 +223,7 @@ echo                        ██║   ╚██████╔╝╚███�
 echo                        ╚═╝    ╚═════╝  ╚═════╝ 
 echo.
 color 0F
-echo                    Tech Gameplay Optimizer  v2.2.0
+echo                    Tech Gameplay Optimizer  v2.3.0
 echo     ──────────────────────────────────────────────────────────────
 echo     •  OS: %OS_NAME%
 echo     •  CPU: %CPU_MODEL%
@@ -236,7 +236,7 @@ goto :eof
 
 :MAIN_MENU
 call :PRINT_HEADER
-title TGO v2.2.0
+title TGO v2.3.0
 color 0F
 echo     MAIN MENU
 echo.
@@ -482,11 +482,16 @@ echo     2. Inside geek, click on the 'View' menu at the top.
 echo     3. Select 'Microsoft Store Apps' from the dropdown.
 echo     4. Right-click on the apps you want to remove and choose 'Uninstall'.
 echo     5. After you are done, CLOSE geek to finish this step.
+echo.
 if exist "C:\TGO\geek.exe" (
     start /wait "" "C:\TGO\geek.exe"
 ) else (
+    call :PRINT_HEADER
+    color 0C
     echo     Geek Uninstaller not found in C:\TGO\geek.exe.
     echo     Please download resources first via Main Menu [R].
+    pause
+    goto BLOATWARE_MENU
 )
 call :WRITE_LOG "Manual Debloat Completed."
 call :PRINT_HEADER
@@ -1866,6 +1871,9 @@ echo     [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
 echo     ──────────────────────────────────────────────────────────────
 color 0F
 echo.
+echo     [v2.3.0]
+echo       + Added Taskbar ^& Start Menu Cleaner in additional tweaks.
+echo.
 echo     [v2.2.0]
 echo       + Added Windows Apps Debloater Menu.
 echo       + Integrated automatic and interactive bloatware removal.
@@ -1933,6 +1941,7 @@ echo     [3] Turn off all Windows Animations
 echo     [4] Delete all useless apps via third-party tool
 echo     [5] Turn on or off User Account Control
 echo     [6] Turn on or off Transparency Effects and Color on Title Bars
+echo     [7] Taskbar ^& Start Menu Cleaner
 echo     [B] Back to Main Menu
 echo.
 set /p add_choice="Select option: "
@@ -1943,11 +1952,55 @@ if "%add_choice%"=="3" goto ADVANCED_SYSTEM_SETTINGS
 if "%add_choice%"=="4" goto DELETE_APPS
 if "%add_choice%"=="5" goto UAC
 if "%add_choice%"=="6" goto VISUAL_EFFECTS_MENU
+if "%add_choice%"=="7" goto TASKBAR_START_CLEANER
 if /i "%add_choice%"=="B" goto MAIN_MENU
 
 echo Invalid selection
 echo Press any key to continue...
 pause >nul
+goto ADDITIONAL_TWEAKS
+
+:TASKBAR_START_CLEANER
+call :PRINT_HEADER
+color 0E
+echo     Cleaning Taskbar and Start Menu...
+echo     Please wait, Explorer will be restarted.
+echo.
+
+:: 1. Hide Copilot
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowCopilotButton" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot" /v "TurnOffWindowsCopilot" /t REG_DWORD /d 1 /f >nul 2>&1
+reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsCopilot" /v "TurnOffWindowsCopilot" /t REG_DWORD /d 1 /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\Shell\Copilot\BingChat" /v "IsUserEligible" /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 2. Hide Task View
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 3. Hide Widgets
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 4. Hide Chat
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarMn" /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 5. Set Search to Icon Only
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 1 /f >nul 2>&1
+
+:: 6. Clean Start Menu pins
+:: Deleting start.bin resets the Start Menu layout to Windows defaults.
+if exist "%LocalAppData%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\start.bin" (
+    del /f /q "%LocalAppData%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\start.bin" >nul 2>&1
+)
+
+:: Restart Explorer to apply changes
+taskkill /f /im explorer.exe >nul 2>&1
+start explorer.exe
+
+call :WRITE_LOG "Cleaned Taskbar & Start Menu Pins"
+call :PRINT_HEADER
+color 0A
+echo     [SUCCESS] Taskbar and Start Menu have been cleaned. Returning to menu...
+timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :ADVANCED_SYSTEM_SETTINGS
