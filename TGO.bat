@@ -8,11 +8,11 @@ if %errorLevel% neq 0 (
     color 0C
     cls
     echo.
-    echo [WARNING] Not running as administrator
-    echo Some features may not work properly.
-    echo Please run as Administrator for full functionality.
+    echo                              [WARNING] Not running as administrator
+    echo                               Some features may not work properly.
+    echo                         Please run as Administrator for full functionality.
     echo.
-    echo Restarting as Administrator...
+    echo                                   Restarting as Administrator...
     echo.
     
     :: This part will call UAC to "Run as administrator"
@@ -26,7 +26,7 @@ if %errorLevel% neq 0 (
 :: Hardware and OS Detection
 :DETECT_HARDWARE
 cls
-echo     Detecting Hardware info...
+echo                                       Detecting Hardware info...
 
 :: CPU Info
 for /f "usebackq tokens=*" %%A in (`powershell -NoProfile -Command "Get-CimInstance Win32_Processor | Select-Object -ExpandProperty Name"`) do set "CPU_MODEL=%%A"
@@ -152,22 +152,23 @@ goto STARTUP_RESTORE_CHECK
 cls
 color 0E
 echo.
-echo     ───────────────────────────────────
-echo                 SAFETY CHECK
-echo     ───────────────────────────────────
+echo                         ──────────────────────────────────────────────────
+echo                                            SAFETY CHECK
+echo                         ──────────────────────────────────────────────────
 echo.
-echo     It is highly recommended to create a Restore Point
-echo     before applying any optimizations.
+echo                         It is highly recommended to create a Restore Point
+echo                         before applying any optimizations.
 echo.
-echo     Would you like to create a System Restore Point now?
+echo                         Would you like to create a System Restore Point now?
 echo.
-set /p start_rp="Select option (Y/N): "
+powershell -NoProfile -Command "[Console]::Write('                        Select option (Y/N): ')"
+set /p start_rp=""
 
 if /i "%start_rp%"=="N" goto MAIN_MENU
 if /i "%start_rp%"=="Y" goto STARTUP_CREATE_RP
 
-echo Invalid selection
-echo Press any key to continue...
+echo                         Invalid selection
+echo                         Press any key to continue...
 pause >nul
 goto STARTUP_RESTORE_CHECK
 
@@ -175,9 +176,9 @@ goto STARTUP_RESTORE_CHECK
 cls
 color 0E
 echo.
-echo     Preparing to create Restore Point...
+echo                    Preparing to create Restore Point...
 echo.
-echo     This may take a moment...
+echo                    This may take a moment...
 echo.
 
 powershell -Command "Enable-ComputerRestore -Drive 'C:' -ErrorAction SilentlyContinue" >nul 2>&1
@@ -191,19 +192,19 @@ if %errorlevel% neq 0 (
     call :WRITE_LOG "Safety check failed to created"
     color 0C
     echo.
-    echo     [FAILED] Could not create restore point.
-    echo     System Restore might be disabled by Group Policy or disk is full.
+    echo                    [FAILED] Could not create restore point.
+    echo                    System Restore might be disabled by Group Policy or disk is full.
     echo.
-    echo     Proceeding to Main Menu without Restore Point...
+    echo                    Proceeding to Main Menu without Restore Point...
     timeout /t 3 >nul
 ) else (
     cls
     call :WRITE_LOG "Safety check successfully created"
     color 0A
     echo.
-    echo     [SUCCESS] Restore point created successfully!
+    echo                    [SUCCESS] Restore point created successfully!
     echo.
-    echo     Proceeding to Main Menu...
+    echo                    Proceeding to Main Menu...
     timeout /t 3 >nul
 )
 
@@ -215,71 +216,75 @@ goto MAIN_MENU
 cls
 color 0B
 echo.
-echo                     ████████╗ ██████╗  ██████╗ 
-echo                     ╚══██╔══╝██╔════╝ ██╔═══██╗
-echo                        ██║   ██║  ███╗██║   ██║
-echo                        ██║   ██║   ██║██║   ██║
-echo                        ██║   ╚██████╔╝╚██████╔╝
-echo                        ╚═╝    ╚═════╝  ╚═════╝ 
+echo                                     ████████╗ ██████╗  ██████╗ 
+echo                                     ╚══██╔══╝██╔════╝ ██╔═══██╗
+echo                                        ██║   ██║  ███╗██║   ██║
+echo                                        ██║   ██║   ██║██║   ██║
+echo                                        ██║   ╚██████╔╝╚██████╔╝
+echo                                        ╚═╝    ╚═════╝  ╚═════╝ 
 echo.
 color 0F
-echo                    Tech Gameplay Optimizer  v2.3.0
-echo     ──────────────────────────────────────────────────────────────
-echo     •  OS: %OS_NAME%
-echo     •  CPU: %CPU_MODEL%
-echo     •  GPU: %GPU_MODEL_DETAIL%
-echo     •  RAM: %RAM_GB%GB
-echo     •  DISK TYPE: %STORAGE_TYPE%
-echo     ──────────────────────────────────────────────────────────────
+echo                                    Tech Gameplay Optimizer  v3.0.0
+echo                    ───────────────────────────────────────────────────────────────
+echo                    •  OS: %OS_NAME%
+echo                    •  CPU: %CPU_MODEL%
+echo                    •  GPU: %GPU_MODEL_DETAIL%
+echo                    •  RAM: %RAM_GB%GB
+echo                    •  DISK TYPE: %STORAGE_TYPE%
+echo                    ───────────────────────────────────────────────────────────────
 echo.
 goto :eof
 
 :MAIN_MENU
 call :PRINT_HEADER
-title TGO v2.3.0
+title TGO v3.0.0
 color 0F
-echo     MAIN MENU
+echo                                               MAIN MENU
 echo.
-echo     [1]  Clean All Temporary Files
-echo     [2]  Disk Optimization                 (Detected: %STORAGE_TYPE%)
-echo     [3]  Mouse and Keyboard Optimization   (Detected: %CPU_THREADS% CPU Threads)
-echo     [4]  RAM Optimization                  (Detected: %RAM_GB%GB)
-echo     [5]  Startup Programs Manager
-echo     [6]  Disable Power Saving Features
-echo     [7]  CPU Optimization                  (Detected: %CPU_TYPE%)
-echo     [8]  GPU Optimization                  (Detected: %OPTIMIZE_GPU%)
-echo     [9]  Services Optimization
+echo                    [0]  System Restore and Recovery
 echo.
-echo     [0]  System Restore and Recovery
-echo     [A]  Additional Tools and Tweaks
-echo     [B]  Windows Apps Debloater
+echo                    [1]  CPU Optimization                  (Detected: %CPU_TYPE%)
+echo                    [2]  GPU Optimization                  (Detected: %OPTIMIZE_GPU%)
+echo                    [3]  RAM Optimization                  (Detected: %RAM_GB%GB)
+echo                    [4]  Disk Optimization                 (Detected: %STORAGE_TYPE%)
+echo                    [5]  Mouse and Keyboard Optimization   (Detected: %CPU_THREADS% CPU Threads)
+echo                    [6]  Disable Power Saving Features
+echo                    [7]  Services Optimization
+echo                    [8]  Startup Programs Manager
+echo                    [9]  Clean All Temporary Files
 echo.
-echo     [R]  Redownload All Resources
-echo     [L]  View Optimization Log
-echo     [C]  Changelog
-echo     [E]  Exit
+echo                    [A]  Additional Tools and Tweaks
+echo                    [B]  Windows Apps Debloater
+echo                    [D]  Download Essentials
 echo.
-set /p choice="Select option: "
+echo                    [R]  Redownload All Resources
+echo                    [L]  View Optimization Log
+echo                    [C]  Changelog
+echo                    [E]  Exit
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p choice=""
 
-if "%choice%"=="1" goto CLEAN_TEMP
-if "%choice%"=="2" goto DISK_OPTIMIZATION_MENU
-if "%choice%"=="3" goto MOUSE_KEYBOARD_MENU
-if "%choice%"=="4" goto RAM_OPTIMIZATION_MENU
-if "%choice%"=="5" goto STARTUP_OPTIMIZATION
-if "%choice%"=="6" goto POWER_SAVING
-if "%choice%"=="7" goto CPU_MENU
-if "%choice%"=="8" goto GPU_MENU
-if "%choice%"=="9" goto SERVICES_OPTIMIZATION_MENU
 if "%choice%"=="0" goto SYSTEM_RESTORE_MENU
+if "%choice%"=="1" goto CPU_MENU
+if "%choice%"=="2" goto GPU_MENU
+if "%choice%"=="3" goto RAM_OPTIMIZATION_MENU
+if "%choice%"=="4" goto DISK_OPTIMIZATION_MENU
+if "%choice%"=="5" goto MOUSE_KEYBOARD_MENU
+if "%choice%"=="6" goto POWER_SAVING
+if "%choice%"=="7" goto SERVICES_OPTIMIZATION_MENU
+if "%choice%"=="8" goto STARTUP_OPTIMIZATION
+if "%choice%"=="9" goto CLEAN_TEMP
 if /i "%choice%"=="A" goto ADDITIONAL_TWEAKS
 if /i "%choice%"=="B" goto BLOATWARE_MENU
+if /i "%choice%"=="D" goto DOWNLOAD_ESSENTIALS_MENU
 if /i "%choice%"=="R" goto REDOWNLOAD
 if /i "%choice%"=="L" goto VIEW_LOG
 if /i "%choice%"=="C" goto CHANGELOG
 if /i "%choice%"=="E" exit
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto MAIN_MENU
 
@@ -290,18 +295,19 @@ goto MAIN_MENU
 title Windows Apps Debloater
 call :PRINT_HEADER
 color 0F
-echo     WINDOWS APPS DEBLOATER
+echo                    WINDOWS APPS DEBLOATER
 echo.
-echo     [1]  Remove All Windows Bloatware
-echo     [2]  Remove Specific Windows Bloatware
-echo     [3]  Restore All Windows Bloatware
-echo     [4]  Restore Specific Windows Bloatware
-echo     [5]  Advanced Manual Removal
-echo     [6]  Remove Microsoft Edge
-echo     [7]  Restore Microsoft Edge
-echo     [B]  Back to Main Menu
+echo                    [1]  Remove All Windows Bloatware
+echo                    [2]  Remove Specific Windows Bloatware
+echo                    [3]  Restore All Windows Bloatware
+echo                    [4]  Restore Specific Windows Bloatware
+echo                    [5]  Advanced Manual Removal
+echo                    [6]  Remove Microsoft Edge
+echo                    [7]  Restore Microsoft Edge
+echo                    [B]  Back to Main Menu
 echo.
-set /p bw_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p bw_choice=""
 if "%bw_choice%"=="1" goto DEBLOAT_ALL
 if "%bw_choice%"=="2" goto DEBLOAT_INTERACTIVE
 if "%bw_choice%"=="3" goto DEBLOAT_RESTORE_ALL
@@ -311,21 +317,21 @@ if "%bw_choice%"=="6" goto EDGE_REMOVE
 if "%bw_choice%"=="7" goto EDGE_RESTORE
 if /i "%bw_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto BLOATWARE_MENU
 
 :DEBLOAT_ALL
 call :PRINT_HEADER
 color 0E
-echo     Removing All Windows Bloatware...
-echo     Please wait, this might take a while...
+echo                    Removing All Windows Bloatware...
+echo                    Please wait, this might take a while...
 echo.
 set "apps=Microsoft.3DBuilder Microsoft.Print3D Microsoft.Microsoft3DViewer Microsoft.WindowsAlarms Microsoft.BingNews Microsoft.WindowsCalculator Microsoft.WindowsCamera Microsoft.549981C3F5F10 Microsoft.WindowsFeedbackHub Microsoft.GetHelp Microsoft.Getstarted Microsoft.WindowsMaps Microsoft.Messaging Microsoft.MicrosoftOfficeHub Microsoft.Office.Sway Microsoft.Office.Desktop microsoft.windowscommunicationsapps Microsoft.MixedReality.Portal Microsoft.Wallet Microsoft.People Microsoft.Office.OneNote Microsoft.ScreenSketch Microsoft.MicrosoftSolitaireCollection Microsoft.MicrosoftStickyNotes Microsoft.StorePurchaseApp Microsoft.ZuneMusic Microsoft.Windows.Photos Microsoft.RemoteDesktop Microsoft.WindowsSoundRecorder Microsoft.BingWeather Microsoft.XboxApp Microsoft.XboxGamingOverlay Microsoft.Xbox.TCUI Microsoft.XboxGameOverlay Microsoft.XboxIdentityProvider Microsoft.XboxSpeechToTextOverlay Microsoft.YourPhone Microsoft.MSPaint AppUp.IntelGraphicsControlPanel RealtekSemiconductorCorp.RealtekAudioControl Twitter Spotify Microsoft.NetworkSpeedTest Mirkat.Mirkat 7EE7776C.LinkedInforWindows Flipboard Facebook Duolingo-LearnLanguagesforFree CandyCrush AdobeSystemsIncorporated.AdobePhotoshopExpress"
 
 for %%A in (%apps%) do (
-    echo     Removing %%A...
+    echo                    Removing %%A...
     PowerShell -NoProfile -Command "Get-AppxPackage -allusers *%%A* | Remove-AppxPackage -ErrorAction SilentlyContinue" >nul 2>&1
 )
 :: Handle Cortana & Copilot special case
@@ -335,17 +341,17 @@ call :WRITE_LOG "All-in-One Debloat executed."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] All common bloatware removed.
+echo                    [SUCCESS] All common bloatware removed.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :DEBLOAT_INTERACTIVE
 call :PRINT_HEADER
 color 0E
-echo     INTERACTIVE DEBLOAT
-echo     Answer Y to remove, N to skip.
+echo                    INTERACTIVE DEBLOAT
+echo                    Answer Y to remove, N to skip.
 echo.
 set "apps=Microsoft.3DBuilder:3D_Builder Microsoft.Print3D:3D_Print Microsoft.Microsoft3DViewer:3D_Viewer Microsoft.WindowsAlarms:Alarms Microsoft.BingNews:Bing_News Microsoft.WindowsCalculator:Calculator Microsoft.WindowsCamera:Camera Microsoft.549981C3F5F10:Cortana Microsoft.WindowsFeedbackHub:Feedback_Hub Microsoft.GetHelp:Get_Help Microsoft.Getstarted:Get_Started Microsoft.WindowsMaps:Maps Microsoft.Messaging:Messaging Microsoft.MicrosoftOfficeHub:Office_Hub microsoft.windowscommunicationsapps:Mail_and_Calendar Microsoft.MixedReality.Portal:Mixed_Reality Microsoft.Wallet:Microsoft_Pay Microsoft.People:People Microsoft.Office.OneNote:OneNote Microsoft.ScreenSketch:Snip_and_Sketch Microsoft.MicrosoftSolitaireCollection:Solitaire Microsoft.MicrosoftStickyNotes:Sticky_Notes Microsoft.StorePurchaseApp:Store_Purchase Microsoft.ZuneMusic:Zune_Music Microsoft.Windows.Photos:Photos Microsoft.RemoteDesktop:Remote_Desktop Microsoft.WindowsSoundRecorder:Sound_Recorder Microsoft.BingWeather:Weather Microsoft.XboxApp:Xbox Microsoft.YourPhone:Your_Phone Microsoft.MSPaint:MS_Paint Spotify:Spotify Twitter:Twitter Facebook:Facebook CandyCrush:Candy_Crush"
 
@@ -357,34 +363,34 @@ call :WRITE_LOG "Interactive Debloat executed."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Interactive Debloat Finished.
+echo                    [SUCCESS] Interactive Debloat Finished.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :DEBLOAT_RESTORE_ALL
 call :PRINT_HEADER
 color 0E
-echo     RESTORE ALL BLOATWARE (ALL-IN-ONE)
+echo                    RESTORE ALL BLOATWARE (ALL-IN-ONE)
 echo.
-echo     Restoring all apps... This takes a while.
+echo                    Restoring all apps... This takes a while.
 PowerShell -NoProfile -Command "Get-AppxPackage -allusers | foreach {Add-AppxPackage -register \"$($_.InstallLocation)\appxmanifest.xml\" -DisabledevelopmentMode}" >nul 2>&1
 call :WRITE_LOG "Restored all bloatware apps."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Restored all apps.
+echo                    [SUCCESS] Restored all apps.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :DEBLOAT_RESTORE_INTERACTIVE
 call :PRINT_HEADER
 color 0E
-echo     RESTORE SPECIFIC BLOATWARE
-echo     Answer Y to remove, N to skip.
+echo                    RESTORE SPECIFIC BLOATWARE
+echo                    Answer Y to remove, N to skip.
 echo.
 set "apps=Microsoft.3DBuilder:3D_Builder Microsoft.Print3D:3D_Print Microsoft.Microsoft3DViewer:3D_Viewer Microsoft.WindowsAlarms:Alarms Microsoft.BingNews:Bing_News Microsoft.WindowsCalculator:Calculator Microsoft.WindowsCamera:Camera Microsoft.549981C3F5F10:Cortana Microsoft.WindowsFeedbackHub:Feedback_Hub Microsoft.GetHelp:Get_Help Microsoft.Getstarted:Get_Started Microsoft.WindowsMaps:Maps Microsoft.Messaging:Messaging Microsoft.MicrosoftOfficeHub:Office_Hub microsoft.windowscommunicationsapps:Mail_and_Calendar Microsoft.MixedReality.Portal:Mixed_Reality Microsoft.Wallet:Microsoft_Pay Microsoft.People:People Microsoft.Office.OneNote:OneNote Microsoft.ScreenSketch:Snip_and_Sketch Microsoft.MicrosoftSolitaireCollection:Solitaire Microsoft.MicrosoftStickyNotes:Sticky_Notes Microsoft.StorePurchaseApp:Store_Purchase Microsoft.ZuneMusic:Zune_Music Microsoft.Windows.Photos:Photos Microsoft.RemoteDesktop:Remote_Desktop Microsoft.WindowsSoundRecorder:Sound_Recorder Microsoft.BingWeather:Weather Microsoft.XboxApp:Xbox Microsoft.YourPhone:Your_Phone Microsoft.MSPaint:MS_Paint Spotify:Spotify Twitter:Twitter Facebook:Facebook CandyCrush:Candy_Crush"
 for /f %%a in ('"prompt $H & echo on & for %%b in (1) do rem"') do set "BS=%%a"
@@ -394,25 +400,26 @@ call :WRITE_LOG "Restored specific bloatware apps."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Restored specific apps.
+echo                    [SUCCESS] Restored specific apps.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :EDGE_REMOVE
 call :PRINT_HEADER
 color 0C
-echo     REMOVE MICROSOFT EDGE
+echo                    REMOVE MICROSOFT EDGE
 echo.
-echo     WARNING: This will permanently remove the Edge Browser.
-echo     (Edge WebView2 will be kept safe to prevent system breakage).
+echo                    WARNING: This will permanently remove the Edge Browser.
+echo                    (Edge WebView2 will be kept safe to prevent system breakage).
 echo.
-set /p confirm="Are you sure you want to remove Edge? (Y/N): "
+powershell -NoProfile -Command "[Console]::Write('                    Are you sure you want to remove Edge? (Y/N): ')"
+set /p confirm=""
 if /i "%confirm%" neq "Y" goto BLOATWARE_MENU
 
 echo.
-echo     Removing Microsoft Edge...
+echo                    Removing Microsoft Edge...
 taskkill /f /im msedge.exe >nul 2>&1
 taskkill /f /im msedge.exe /fi "IMAGENAME eq msedge.exe" >nul 2>&1
 rd /s /q "%ProgramFiles(x86)%\Microsoft\Edge" >nul 2>&1
@@ -438,18 +445,18 @@ call :WRITE_LOG "Microsoft Edge removed."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Microsoft Edge has been removed.
+echo                    [SUCCESS] Microsoft Edge has been removed.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :EDGE_RESTORE
 call :PRINT_HEADER
 color 0E
-echo     RESTORE MICROSOFT EDGE
+echo                    RESTORE MICROSOFT EDGE
 echo.
-echo     Restoring Edge via winget...
+echo                    Restoring Edge via winget...
 reg delete "HKLM\SOFTWARE\Microsoft\EdgeUpdate" /v DoNotUpdateToEdgeWithChromium /f >nul 2>&1
 reg delete "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v InstallDefault /f >nul 2>&1
 reg delete "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v UpdateDefault /f >nul 2>&1
@@ -464,32 +471,32 @@ call :WRITE_LOG "Microsoft Edge restored."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Microsoft Edge restoration completed/initiated.
+echo                    [SUCCESS] Microsoft Edge restoration completed/initiated.
 echo.
-echo     Back to Windows Apps Debloater menu...
+echo                    Back to Windows Apps Debloater menu...
 timeout /t 3 >nul
 goto BLOATWARE_MENU
 
 :DEBLOAT_MANUAL
 call :PRINT_HEADER
 color 0E
-echo     MANUAL DEBLOAT
+echo                    MANUAL DEBLOAT
 echo.
-echo     Delete Apps Guide
+echo                    Delete Apps Guide
 echo.
-echo     1. geek will be launched shortly...
-echo     2. Inside geek, click on the 'View' menu at the top.
-echo     3. Select 'Microsoft Store Apps' from the dropdown.
-echo     4. Right-click on the apps you want to remove and choose 'Uninstall'.
-echo     5. After you are done, CLOSE geek to finish this step.
+echo                    1. geek will be launched shortly...
+echo                    2. Inside geek, click on the 'View' menu at the top.
+echo                    3. Select 'Microsoft Store Apps' from the dropdown.
+echo                    4. Right-click on the apps you want to remove and choose 'Uninstall'.
+echo                    5. After you are done, CLOSE geek to finish this step.
 echo.
 if exist "C:\TGO\geek.exe" (
     start /wait "" "C:\TGO\geek.exe"
 ) else (
     call :PRINT_HEADER
     color 0C
-    echo     Geek Uninstaller not found in C:\TGO\geek.exe.
-    echo     Please download resources first via Main Menu [R].
+    echo                    Geek Uninstaller not found in C:\TGO\geek.exe.
+    echo                    Please download resources first via Main Menu [R].
     pause
     goto BLOATWARE_MENU
 )
@@ -497,10 +504,186 @@ call :WRITE_LOG "Manual Debloat Completed."
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] geek has been closed. Returning to menu...
+echo                    [SUCCESS] geek has been closed. Returning to menu...
 echo.
 timeout /t 3 >nul
 goto BLOATWARE_MENU
+
+:: ============================================================================
+:: DOWNLOAD ESSENTIALS
+:: ============================================================================
+:DOWNLOAD_ESSENTIALS_MENU
+title Download Essentials
+call :PRINT_HEADER
+color 0F
+echo                    DOWNLOAD ESSENTIALS
+echo.
+echo                    [1]  Browsers (Chrome, Firefox, Brave, etc.)
+echo                    [B]  Back to Main Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p de_choice=""
+
+if "%de_choice%"=="1" goto DE_BROWSERS
+if /i "%de_choice%"=="B" goto MAIN_MENU
+
+echo                    Invalid selection
+echo                    Press any key to continue...
+pause >nul
+goto DOWNLOAD_ESSENTIALS_MENU
+
+:DE_BROWSERS
+call :PRINT_HEADER
+color 0F
+echo                    SELECT BROWSERS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 3 5", or type "ALL" for all of them!)
+echo.
+echo                    [1] Google Chrome          [4] Brave
+echo                    [2] Thorium (AVX2)         [5] Vivaldi
+echo                    [3] Mozilla Firefox        [6] LibreWolf
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select browsers: ')"
+set /p br_choice=""
+
+if /i "%br_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%br_choice%"=="ALL" set "br_choice=1 2 3 4 5 6"
+
+set "valid_selection=0"
+for %%A in (%br_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+    if "%%A"=="3" set "valid_selection=1"
+    if "%%A"=="4" set "valid_selection=1"
+    if "%%A"=="5" set "valid_selection=1"
+    if "%%A"=="6" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_BROWSERS
+)
+
+for %%A in (%br_choice%) do (
+    if "%%A"=="1" call :INSTALL_CHROME
+    if "%%A"=="2" call :INSTALL_THORIUM
+    if "%%A"=="3" call :INSTALL_FIREFOX
+    if "%%A"=="4" call :INSTALL_BRAVE
+    if "%%A"=="5" call :INSTALL_VIVALDI
+    if "%%A"=="6" call :INSTALL_LIBREWOLF
+)
+
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected browsers have been installed.
+echo.
+echo                    Returning to Download Essentials menu...
+timeout /t 3 >nul
+goto DE_BROWSERS
+
+:INSTALL_CHROME
+color 0E
+echo.
+echo                    Downloading Google Chrome...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi' -OutFile '%TEMP%\ChromeSetup.msi' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\ChromeSetup.msi" (
+    echo                    Installing Google Chrome...
+    msiexec /i "%TEMP%\ChromeSetup.msi" /qn /norestart
+    del /f /q "%TEMP%\ChromeSetup.msi" >nul 2>&1
+    echo                    Launching Google Chrome...
+    if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" start "" "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+)
+goto :eof
+
+:INSTALL_THORIUM
+color 0E
+echo.
+echo                    Downloading Thorium AVX2...
+powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/Alex313031/Thorium-Win/releases/tags/M138.0.7204.303'; $url = ($r.assets | Where-Object { $_.name -like '*mini_installer.exe' -and $_.name -like '*AVX2*' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\ThoriumSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+if exist "%TEMP%\ThoriumSetup.exe" (
+    echo                    Installing Thorium AVX2...
+    start /wait "" "%TEMP%\ThoriumSetup.exe" --system-level
+    del /f /q "%TEMP%\ThoriumSetup.exe" >nul 2>&1
+    echo                    Launching Thorium...
+    if exist "C:\Program Files\Thorium\Application\thorium.exe" start "" "C:\Program Files\Thorium\Application\thorium.exe"
+    if exist "C:\Program Files (x86)\Thorium\Application\thorium.exe" start "" "C:\Program Files (x86)\Thorium\Application\thorium.exe"
+    if exist "%LOCALAPPDATA%\Thorium\Application\thorium.exe" start "" "%LOCALAPPDATA%\Thorium\Application\thorium.exe"
+)
+goto :eof
+
+:INSTALL_FIREFOX
+color 0E
+echo.
+echo                    Downloading Mozilla Firefox...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US' -OutFile '%TEMP%\FirefoxSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\FirefoxSetup.exe" (
+    echo                    Installing Mozilla Firefox...
+    start /wait "" "%TEMP%\FirefoxSetup.exe" /S
+    del /f /q "%TEMP%\FirefoxSetup.exe" >nul 2>&1
+    echo                    Launching Mozilla Firefox...
+    if exist "C:\Program Files\Mozilla Firefox\firefox.exe" start "" "C:\Program Files\Mozilla Firefox\firefox.exe"
+    if exist "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" start "" "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
+)
+goto :eof
+
+:INSTALL_BRAVE
+color 0E
+echo.
+echo                    Downloading Brave...
+powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/brave/brave-browser/releases/latest'; $url = ($r.assets | Where-Object { $_.name -eq 'BraveBrowserStandaloneSilentSetup.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\BraveSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+if exist "%TEMP%\BraveSetup.exe" (
+    echo                    Installing Brave...
+    start /wait "" "%TEMP%\BraveSetup.exe"
+    for /L %%I in (1,1,30) do (
+        if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+        if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+        if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+        timeout /t 1 >nul
+    )
+    :BRAVE_DONE
+    del /f /q "%TEMP%\BraveSetup.exe" >nul 2>&1
+    echo                    Launching Brave...
+    if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+    if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe"
+    if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe"
+)
+goto :eof
+
+:INSTALL_VIVALDI
+color 0E
+echo.
+echo                    Downloading Vivaldi...
+powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://vivaldi.com/download/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'vivaldi\..*x64\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\VivaldiSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+if exist "%TEMP%\VivaldiSetup.exe" (
+    echo                    Installing Vivaldi...
+    start /wait "" "%TEMP%\VivaldiSetup.exe" --vivaldi-silent --do-not-launch-chrome
+    del /f /q "%TEMP%\VivaldiSetup.exe" >nul 2>&1
+    echo                    Launching Vivaldi...
+    if exist "C:\Program Files\Vivaldi\Application\vivaldi.exe" start "" "C:\Program Files\Vivaldi\Application\vivaldi.exe"
+    if exist "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe" start "" "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe"
+)
+goto :eof
+
+
+:INSTALL_LIBREWOLF
+color 0E
+echo.
+echo                    Downloading LibreWolf...
+powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://librewolf.net/installation/windows/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'librewolf-.*windows-x86_64-setup\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\LibreWolfSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+if exist "%TEMP%\LibreWolfSetup.exe" (
+    echo                    Installing LibreWolf...
+    start /wait "" "%TEMP%\LibreWolfSetup.exe" /S
+    del /f /q "%TEMP%\LibreWolfSetup.exe" >nul 2>&1
+    echo                    Launching LibreWolf...
+    if exist "C:\Program Files\LibreWolf\librewolf.exe" start "" "C:\Program Files\LibreWolf\librewolf.exe"
+)
+goto :eof
 
 :: ============================================================================
 :: VIEW LOG
@@ -523,25 +706,25 @@ goto MAIN_MENU
 title Clean All Temporary Files
 call :PRINT_HEADER
 color 0E
-echo     CLEAN ALL TEMPORARY FILES
+echo                    CLEAN ALL TEMPORARY FILES
 echo.
-echo     This may take a few minutes.
-echo     Please wait...
+echo                    This may take a few minutes.
+echo                    Please wait...
 echo.
 
 :: Flush DNS cache
-echo     [0/8] Flushing DNS cache...
+echo                    [0/8] Flushing DNS cache...
 echo.
 ipconfig /flushdns >nul 2>&1
 
 :: Clean Windows temp files
-echo     [1/8] Cleaning Windows temp files...
+echo                    [1/8] Cleaning Windows temp files...
 echo.
 del /s /f /q "%windir%\Temp\*.*" >nul 2>&1
 del /s /f /q "%windir%\*.bak" >nul 2>&1
 
 :: Clean user temp files
-echo     [2/8] Cleaning user temp files...
+echo                    [2/8] Cleaning user temp files...
 echo.
 del /s /f /q "%temp%\*.*" >nul 2>&1
 del /s /f /q "%systemdrive%\*.tmp" >nul 2>&1
@@ -552,20 +735,20 @@ del /s /f /q "%systemdrive%\*.chk" >nul 2>&1
 del /s /f /q "%systemdrive%\*.old" >nul 2>&1
 
 :: Clean Windows logs
-echo     [3/8] Cleaning specific system logs...
+echo                    [3/8] Cleaning specific system logs...
 echo.
 del /f /q "%SystemRoot%\Logs\CBS\CBS.log" >nul 2>&1
 del /f /q "%SystemRoot%\Logs\DISM\DISM.log" >nul 2>&1
 
 :: Clean thumbnail cache
-echo     [4/8] Cleaning thumbnail cache...
+echo                    [4/8] Cleaning thumbnail cache...
 echo.
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" >nul 2>&1
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\*.db" >nul 2>&1
 del /s /f /q "%LocalAppData%\D3DSCache\*.*" >nul 2>&1
 
 :: Clean Windows Update cache
-echo     [5/8] Cleaning Windows Update cache...
+echo                    [5/8] Cleaning Windows Update cache...
 echo.
 net stop wuauserv >nul 2>&1
 net stop UsoSvc >nul 2>&1
@@ -577,27 +760,27 @@ rd /s /q "%windir%\SoftwareDistribution" >nul 2>&1
 md "%windir%\SoftwareDistribution" >nul 2>&1
 
 :: Clean recycle bin
-echo     [6/8] Cleaning recycle bin...
+echo                    [6/8] Cleaning recycle bin...
 echo.
 powershell -NoProfile -Command "Clear-RecycleBin -Force -ErrorAction SilentlyContinue" >nul 2>&1
 
-echo     [7/8] Starting disk cleanup...
+echo                    [7/8] Starting disk cleanup...
 echo.
 
 :: Use /WAIT to wait for cleanmgr.exe to finish
 start "" /WAIT cleanmgr.exe
 
 :: Run disk optimization
-echo     [8/8] Running disk optimization...
+echo                    [8/8] Running disk optimization...
 powershell "Optimize-Volume -DriveLetter C -ReTrim -ErrorAction SilentlyContinue" >nul 2>&1
 
 call :WRITE_LOG "Temporary files cleaned (DNS flush, temp, logs, thumbcache, update cache, recycle bin, disk cleanup, optimize C drive)"
 echo.
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Temporary files cleanup completed
+echo                    [SUCCESS] Temporary files cleanup completed
 echo.
-echo     Back to Main Menu...
+echo                    Back to Main Menu...
 timeout /t 3 >nul
 goto MAIN_MENU
 
@@ -608,33 +791,38 @@ goto MAIN_MENU
 title Disk Optimization
 call :PRINT_HEADER
 color 0F
-echo     DISK OPTIMIZATION
+echo                    DISK OPTIMIZATION
 echo.
-echo     Detected Storage Type: %STORAGE_TYPE%
+echo                    Detected Storage Type: %STORAGE_TYPE%
 echo.
 timeout /t 2 >nul
 
 if /i "%STORAGE_TYPE%"=="SSD" (
-    echo     SSD detected. Running automatic SSD optimization...
+    echo                    SSD detected. Running automatic SSD optimization...
     timeout /t 3 >nul
     goto SSD_OPTIMIZATION
 ) else if /i "%STORAGE_TYPE%"=="HDD" (
-    echo     HDD detected. Running automatic HDD optimization...
+    echo                    HDD detected. Running automatic HDD optimization...
     timeout /t 3 >nul
     goto HDD_OPTIMIZATION
 ) else (
-    echo     Could not auto-detect storage type.
+    echo                    Could not auto-detect storage type.
     echo.
-    echo     [1] HDD Optimization
-    echo     [2] SSD Optimization
-    echo     [B] Back to Main Menu
+    echo                    [1] HDD Optimization
+    echo                    [2] SSD Optimization
+    echo                    [3] Revert HDD Settings to Default
+    echo                    [4] Revert SSD Settings to Default
+    echo                    [B] Back to Main Menu
     echo.
-    set /p disk_choice="Select option: "
+    powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+    set /p disk_choice=""
     if "%disk_choice%"=="1" goto HDD_OPTIMIZATION
     if "%disk_choice%"=="2" goto SSD_OPTIMIZATION
+    if "%disk_choice%"=="3" goto HDD_REVERT
+    if "%disk_choice%"=="4" goto SSD_REVERT
     if /i "%disk_choice%"=="B" goto MAIN_MENU
-    echo Invalid selection
-    echo Press any key to continue...
+    echo                    Invalid selection
+    echo                    Press any key to continue...
     pause >nul
     goto DISK_OPTIMIZATION_MENU
 )
@@ -642,10 +830,10 @@ if /i "%STORAGE_TYPE%"=="SSD" (
 :HDD_OPTIMIZATION
 call :PRINT_HEADER
 color 0E
-echo     Please wait...
+echo                    Please wait...
 echo.
 
-echo     (Step 1/3) Optimizing HDD Registry parameters...
+echo                    (Step 1/3) Optimizing HDD Registry parameters...
 echo.
 for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PnpDevice -Class DiskDrive -PresentOnly | ForEach-Object { $_.InstanceId }"') do (
     for /f "delims=" %%a in ("%%i") do set "diskid=%%a"
@@ -655,7 +843,7 @@ for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command
     reg add "!diskpath!" /v "CacheIsPowerProtected" /t REG_DWORD /d "1" /f >nul 2>&1
 )
 
-echo     (Step 2/3) Applying NTFS filesystem tweaks...
+echo                    (Step 2/3) Applying NTFS filesystem tweaks...
 echo.
 fsutil behavior set memoryusage 2 >nul 2>&1
 fsutil behavior set disablelastaccess 1 >nul 2>&1
@@ -664,11 +852,11 @@ fsutil behavior set encryptpagingfile 0 >nul 2>&1
 fsutil behavior set mftzone 4 >nul 2>&1
 fsutil behavior set disable8dot3 1 >nul 2>&1
 
-echo     (Step 3/4) Disabling Prefetcher via Registry...
+echo                    (Step 3/4) Disabling Prefetcher via Registry...
 echo.
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 0 /f >nul 2>&1
 
-echo     (Step 4/4) Disabling SysMain service...
+echo                    (Step 4/4) Disabling SysMain service...
 echo.
 :: Via Service
 sc config SysMain start=disabled >nul 2>&1
@@ -680,30 +868,80 @@ call :WRITE_LOG "HDD optimization applied (registry, NTFS tweaks, prefetcher dis
 echo.
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] HDD optimization completed
+echo                    [SUCCESS] HDD optimization completed
 echo.
-echo     Back to Main Menu...
-timeout /t 5 >nul
+echo                    [0]  Revert HDD Settings to Default
+echo                    [B]  Back to Main Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p hdd_done_choice=""
+if "%hdd_done_choice%"=="0" goto HDD_REVERT
+if /i "%hdd_done_choice%"=="B" goto MAIN_MENU
+echo                    Invalid selection
+echo                    Press any key to continue...
+pause >nul
+goto MAIN_MENU
+
+:HDD_REVERT
+call :PRINT_HEADER
+color 0E
+echo                    Reverting HDD settings to default...
+echo                    Please wait...
+echo.
+
+echo                    (Step 1/4) Reverting HDD Registry parameters...
+echo.
+for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PnpDevice -Class DiskDrive -PresentOnly | ForEach-Object { $_.InstanceId }"') do (
+    for /f "delims=" %%a in ("%%i") do set "diskid=%%a"
+    set "diskpath=HKLM\SYSTEM\CurrentControlSet\Enum\!diskid!\Device Parameters\Disk"
+    reg delete "!diskpath!" /v "CacheIsPowerProtected" /f >nul 2>&1
+)
+
+echo                    (Step 2/4) Reverting NTFS filesystem tweaks...
+echo.
+fsutil behavior set memoryusage 1 >nul 2>&1
+fsutil behavior set disablelastaccess 0 >nul 2>&1
+fsutil behavior set disabledeletenotify 1 >nul 2>&1
+fsutil behavior set encryptpagingfile 1 >nul 2>&1
+fsutil behavior set mftzone 1 >nul 2>&1
+fsutil behavior set disable8dot3 0 >nul 2>&1
+
+echo                    (Step 3/4) Re-enabling Prefetcher via Registry...
+echo.
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 3 /f >nul 2>&1
+
+echo                    (Step 4/4) Re-enabling SysMain service...
+echo.
+sc config SysMain start=auto >nul 2>&1
+sc start SysMain >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\SysMain" /v Start /t REG_DWORD /d 2 /f >nul 2>&1
+
+call :WRITE_LOG "HDD optimization reverted to default (registry, NTFS, prefetcher, SysMain restored)"
+call :PRINT_HEADER
+color 0A
+echo                    [SUCCESS] HDD settings reverted to default
+echo.
+echo                    Back to Main Menu...
+timeout /t 3 >nul
 goto MAIN_MENU
 
 :SSD_OPTIMIZATION
 call :PRINT_HEADER
 color 0E
-echo     Please wait...
+echo                    Please wait...
 echo.
 
-echo     (Step 1/3) Optimizing SSD Registry parameters...
+echo                    (Step 1/3) Optimizing SSD Registry parameters...
 echo.
 for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PnpDevice -Class DiskDrive -PresentOnly | ForEach-Object { $_.InstanceId }"') do (
     for /f "delims=" %%a in ("%%i") do set "diskid=%%a"
     set "diskpath=HKLM\SYSTEM\CurrentControlSet\Enum\!diskid!\Device Parameters\Disk"
-    
-    :: Eksekusi pembuatan folder Disk dan pengisian tweaks Cache
+
     reg add "!diskpath!" /v "UserWriteCacheSetting" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "!diskpath!" /v "CacheIsPowerProtected" /t REG_DWORD /d "1" /f >nul 2>&1
 )
 
-echo     (Step 2/3) Disabling SSD Power Saving features...
+echo                    (Step 2/3) Disabling SSD Power Saving features...
 echo.
 :: Storage/SD
 Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SD\IdleState\1" /v "IdleExitEnergyMicroJoules" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -727,7 +965,7 @@ Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storag
 Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdlePowerMw" /t REG_DWORD /d "0" /f >nul 2>&1
 Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdleTimeLengthMs" /t REG_DWORD /d "4294967295" /f >nul 2>&1
 
-echo     (Step 3/3) Applying NTFS filesystem tweaks...
+echo                    (Step 3/3) Applying NTFS filesystem tweaks...
 echo.
 fsutil behavior set memoryusage 2 >nul 2>&1
 fsutil behavior set disablelastaccess 1 >nul 2>&1
@@ -739,10 +977,70 @@ call :WRITE_LOG "SSD optimization applied (registry write cache enabled, power s
 echo.
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] SSD optimization completed
+echo                    [SUCCESS] SSD optimization completed
 echo.
-echo     Back to Main Menu...
-timeout /t 5 >nul
+echo                    [0]  Revert SSD Settings to Default
+echo                    [B]  Back to Main Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p ssd_done_choice=""
+if "%ssd_done_choice%"=="0" goto SSD_REVERT
+if /i "%ssd_done_choice%"=="B" goto MAIN_MENU
+echo                    Invalid selection
+echo                    Press any key to continue...
+pause >nul
+goto MAIN_MENU
+
+:SSD_REVERT
+call :PRINT_HEADER
+color 0E
+echo                    Reverting SSD settings to default...
+echo                    Please wait...
+echo.
+
+echo                    (Step 1/3) Reverting SSD Registry parameters...
+echo.
+for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PnpDevice -Class DiskDrive -PresentOnly | ForEach-Object { $_.InstanceId }"') do (
+    for /f "delims=" %%a in ("%%i") do set "diskid=%%a"
+    set "diskpath=HKLM\SYSTEM\CurrentControlSet\Enum\!diskid!\Device Parameters\Disk"
+    reg delete "!diskpath!" /v "UserWriteCacheSetting" /f >nul 2>&1
+    reg delete "!diskpath!" /v "CacheIsPowerProtected" /f >nul 2>&1
+)
+
+echo                    (Step 2/3) Reverting SSD Power Saving keys...
+echo.
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SD\IdleState\1" /v "IdleExitEnergyMicroJoules" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SD\IdleState\1" /v "IdleExitLatencyMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SD\IdleState\1" /v "IdlePowerMw" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SD\IdleState\1" /v "IdleTimeLengthMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\1" /v "IdleExitEnergyMicroJoules" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\1" /v "IdleExitLatencyMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\1" /v "IdlePowerMw" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\1" /v "IdleTimeLengthMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\2" /v "IdleExitEnergyMicroJoules" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\2" /v "IdleExitLatencyMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\2" /v "IdlePowerMw" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\2" /v "IdleTimeLengthMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdleExitEnergyMicroJoules" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdleExitLatencyMs" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdlePowerMw" /f >nul 2>&1
+Reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\Storage\SSD\IdleState\3" /v "IdleTimeLengthMs" /f >nul 2>&1
+
+echo                    (Step 3/3) Reverting NTFS filesystem tweaks...
+echo.
+fsutil behavior set memoryusage 1 >nul 2>&1
+fsutil behavior set disablelastaccess 0 >nul 2>&1
+fsutil behavior set disabledeletenotify 1 >nul 2>&1
+fsutil behavior set encryptpagingfile 1 >nul 2>&1
+fsutil behavior set disable8dot3 0 >nul 2>&1
+
+call :WRITE_LOG "SSD optimization reverted to default (registry, power saving keys removed, NTFS restored)"
+call :PRINT_HEADER
+color 0A
+echo                    [SUCCESS] SSD settings reverted to default
+echo.
+echo                    Back to Main Menu...
+timeout /t 3 >nul
 goto MAIN_MENU
 
 :: ============================================================================
@@ -752,24 +1050,24 @@ goto MAIN_MENU
 title Mouse and Keyboard Optimization
 call :PRINT_HEADER
 color 0F
-echo     MOUSE AND KEYBOARD OPTIMIZATION
+echo                    MOUSE AND KEYBOARD OPTIMIZATION
 echo.
-echo     Detected Logical Processors: %CPU_THREADS% Threads
+echo                    Detected Logical Processors: %CPU_THREADS% Threads
 echo.
 timeout /t 3 >nul
 
 if %CPU_THREADS% GEQ 2 if %CPU_THREADS% LEQ 4 (
-    echo     Low-tier CPU detected. Running Low optimization...
+    echo                    Low-tier CPU detected. Running Low optimization...
     timeout /t 5 >nul
     goto MK_LOW
 )
 if %CPU_THREADS% GEQ 6 if %CPU_THREADS% LEQ 12 (
-    echo     Medium-tier CPU detected. Running Medium optimization...
+    echo                    Medium-tier CPU detected. Running Medium optimization...
     timeout /t 5 >nul
     goto MK_MEDIUM
 )
 if %CPU_THREADS% GEQ 16 if %CPU_THREADS% LEQ 32 (
-    echo     High-tier CPU detected. Running High optimization...
+    echo                    High-tier CPU detected. Running High optimization...
     timeout /t 5 >nul
     goto MK_HIGH
 )
@@ -777,16 +1075,17 @@ if %CPU_THREADS% GEQ 16 if %CPU_THREADS% LEQ 32 (
 :: ============================================================================
 :: MANUAL INPUT FOR ANOMALIES OR UNKNOWN CPU
 :: ============================================================================
-echo     [WARNING] CPU anomaly or unknown thread count detected.
-echo     Please select the optimization level manually:
+echo                    [WARNING] CPU anomaly or unknown thread count detected.
+echo                    Please select the optimization level manually:
 echo.
-echo     L - i3 / Ryzen 3 / Celeron / Athlon (Low)
-echo     M - i5 / Ryzen 5 (Medium)
-echo     H - i7 / i9 / Ryzen 7 / Ryzen 9 (High)
-echo     R - Revert to Default
-echo     B - Back to Main Menu
+echo                    L - i3 / Ryzen 3 / Celeron / Athlon (Low)
+echo                    M - i5 / Ryzen 5 (Medium)
+echo                    H - i7 / i9 / Ryzen 7 / Ryzen 9 (High)
+echo                    R - Revert to Default
+echo                    B - Back to Main Menu
 echo.
-set /p mk_choice="Select optimization level: "
+powershell -NoProfile -Command "[Console]::Write('                    Select optimization level: ')"
+set /p mk_choice=""
 
 if /i "%mk_choice%"=="L" goto MK_LOW
 if /i "%mk_choice%"=="M" goto MK_MEDIUM
@@ -794,8 +1093,8 @@ if /i "%mk_choice%"=="H" goto MK_HIGH
 if /i "%mk_choice%"=="R" goto MK_REVERT
 if /i "%mk_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto MOUSE_KEYBOARD_MENU
 
@@ -803,7 +1102,7 @@ goto MOUSE_KEYBOARD_MENU
 call :PRINT_HEADER
 color 0E
 echo.
-echo     Applying Low optimization...
+echo                    Applying Low optimization...
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v "MouseDataQueueSize" /t REG_DWORD /d "34" /f >nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters" /v "KeyboardDataQueueSize" /t REG_DWORD /d "34" /f >nul
 set MK_LEVEL=Low
@@ -813,7 +1112,7 @@ goto MK_COMMON
 call :PRINT_HEADER
 color 0E
 echo.
-echo     Applying Medium optimization...
+echo                    Applying Medium optimization...
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v "MouseDataQueueSize" /t REG_DWORD /d "24" /f >nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters" /v "KeyboardDataQueueSize" /t REG_DWORD /d "24" /f >nul
 set MK_LEVEL=Medium
@@ -823,7 +1122,7 @@ goto MK_COMMON
 call :PRINT_HEADER
 color 0E
 echo.
-echo     Applying High optimization...
+echo                    Applying High optimization...
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v "MouseDataQueueSize" /t REG_DWORD /d "19" /f >nul
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters" /v "KeyboardDataQueueSize" /t REG_DWORD /d "19" /f >nul
 set MK_LEVEL=High
@@ -831,8 +1130,8 @@ goto MK_COMMON
 
 :MK_COMMON
 echo.
-echo     Applying advanced optimizations (Power, Priority, and Flags)
-echo     This may take a moment...
+echo                    Applying advanced optimizations (Power, Priority, and Flags)
+echo                    This may take a moment...
 
 :: Turn off power saving features for PCI devices to keep latency low
 for /f "delims=" %%i in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -like \"PCI\VEN_*\" } | ForEach-Object { $_.InstanceId }"') do (
@@ -877,18 +1176,19 @@ call :WRITE_LOG "Mouse & Keyboard optimization (%MK_LEVEL%) applied"
 echo.
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] %MK_LEVEL% Optimization completed
+echo                    [SUCCESS] %MK_LEVEL% Optimization completed
 echo.
-echo     [0] Revert to Default Settings
-echo     [B] Back to Main Menu
+echo                    [0] Revert to Default Settings
+echo                    [B] Back to Main Menu
 echo.
-set /p mousek_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p mousek_choice=""
 
 if "%mousek_choice%"=="0" goto MK_REVERT
 if /i "%mousek_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto MAIN_MENU
 
@@ -896,8 +1196,8 @@ goto MAIN_MENU
 call :PRINT_HEADER
 color 0E
 echo.
-echo     Reverting to default settings.
-echo     Please wait...
+echo                    Reverting to default settings.
+echo                    Please wait...
 
 :: Revert Queue Sizes
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v "MouseDataQueueSize" /t REG_DWORD /d "256" /f >nul
@@ -940,9 +1240,9 @@ call :WRITE_LOG "Mouse & Keyboard optimization default settings restored"
 echo.
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Default Mouse and Keyboard settings restored
+echo                    [SUCCESS] Default Mouse and Keyboard settings restored
 echo.
-echo     Back to Main Menu...
+echo                    Back to Main Menu...
 timeout /t 3 >nul
 goto MAIN_MENU
 
@@ -953,19 +1253,19 @@ goto MAIN_MENU
 title RAM Optimization
 call :PRINT_HEADER
 color 0F
-echo     RAM OPTIMIZATION
+echo                    RAM OPTIMIZATION
 echo.
-echo     Detected RAM: %RAM_GB% GB
+echo                    Detected RAM: %RAM_GB% GB
 echo.
 
 if %RAM_GB% LEQ 15 (
-    echo     Applying optimized settings...
+    echo                    Applying optimized settings...
     set /A "svc_value=%RAM_GB%*1024*1024"
     set "ram_desc=%RAM_GB%GB"
     set "cache_val=0"
     set "compress_cmd=Enable-MMAgent -MemoryCompression"
 ) else (
-    echo     Applying high-performance settings...
+    echo                    Applying high-performance settings...
     set /A "svc_value=%RAM_GB%*1024*1024"
     set "ram_desc=%RAM_GB%GB"
     set "cache_val=1"
@@ -973,8 +1273,8 @@ if %RAM_GB% LEQ 15 (
 )
 
 echo.
-echo     Applying settings for %ram_desc%...
-echo     Please wait...
+echo                    Applying settings for %ram_desc%...
+echo                    Please wait...
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t REG_DWORD /d %svc_value% /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "LargeSystemCache" /t REG_DWORD /d %cache_val% /f >nul 2>&1
 powershell -NoProfile -ExecutionPolicy Bypass -Command "%compress_cmd% -ErrorAction SilentlyContinue" >nul 2>&1
@@ -982,18 +1282,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "%compress_cmd% -ErrorAct
 call :WRITE_LOG "RAM optimization applied for %RAM_GB%GB (SvcHostSplitThreshold=%svc_value%, LargeSystemCache=%cache_val%, memory compression toggled)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] RAM optimization completed for %ram_desc%
+echo                    [SUCCESS] RAM optimization completed for %ram_desc%
 echo.
-echo     [0] Revert to Default Settings
-echo     [B] Back to Main Menu
+echo                    [0] Revert to Default Settings
+echo                    [B] Back to Main Menu
 echo.
-set /p ram_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p ram_choice=""
 
 if "%ram_choice%"=="0" goto REVERT_RAM
 if /i "%ram_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto MAIN_MENU
 
@@ -1003,8 +1304,8 @@ goto MAIN_MENU
 :REVERT_RAM
 call :PRINT_HEADER
 color 0E
-echo     Reverting RAM settings to default...
-echo     Please wait...
+echo                    Reverting RAM settings to default...
+echo                    Please wait...
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t REG_DWORD /d 3670016 /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "LargeSystemCache" /t REG_DWORD /d 0 /f >nul 2>&1
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Enable-MMAgent -MemoryCompression -ErrorAction SilentlyContinue" >nul 2>&1
@@ -1012,8 +1313,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "Enable-MMAgent -MemoryCo
 call :WRITE_LOG "RAM optimization default settings applied"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] RAM settings reverted to default
-echo     Back to Main Menu...
+echo                    [SUCCESS] RAM settings reverted to default
+echo                    Back to Main Menu...
 timeout /t 3 >nul
 goto MAIN_MENU
 
@@ -1024,16 +1325,16 @@ goto MAIN_MENU
 call :PRINT_HEADER
 title Startup Optimization
 color 0E
-echo     STARTUP OPTIMIZATION
+echo                    STARTUP OPTIMIZATION
 echo.
-echo     Checking system architecture...
+echo                    Checking system architecture...
 
 if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-    echo     64-bit system detected
+    echo                    64-bit system detected
     set autoruns_url=https://download.sysinternals.com/files/Autoruns.zip
     set autoruns_exe=Autoruns64.exe
 ) else (
-    echo     32-bit system detected  
+    echo                    32-bit system detected  
     set autoruns_url=https://download.sysinternals.com/files/Autoruns.zip
     set autoruns_exe=Autoruns.exe
 )
@@ -1042,22 +1343,22 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 set download_dir=C:\TGO\Autoruns
 if not exist "%download_dir%\%autoruns_exe%" (
     echo.
-    echo     Downloading Autoruns...
+    echo                    Downloading Autoruns...
     if not exist "%download_dir%" mkdir "%download_dir%"
     powershell -Command "Invoke-WebRequest -Uri '%autoruns_url%' -OutFile '%download_dir%\Autoruns.zip'" >nul 2>&1
     
     if exist "%download_dir%\Autoruns.zip" (
-        echo     Extracting Autoruns...
+        echo                    Extracting Autoruns...
         powershell -Command "Expand-Archive -Path '%download_dir%\Autoruns.zip' -DestinationPath '%download_dir%' -Force" >nul 2>&1
         del "%download_dir%\Autoruns.zip" >nul 2>&1
     ) else (
         call :WRITE_LOG "Failed to download Autoruns"
         call :PRINT_HEADER
         color 0C
-        echo     [ERROR] Failed to download Autoruns
-        echo     Please check your internet connection.
+        echo                    [ERROR] Failed to download Autoruns
+        echo                    Please check your internet connection.
         echo.
-        echo     Press any key to continue...
+        echo                    Press any key to continue...
         pause >nul
         goto MAIN_MENU
     )
@@ -1066,26 +1367,26 @@ if not exist "%download_dir%\%autoruns_exe%" (
 :: Main part
 call :PRINT_HEADER
 color 0E
-echo     Startup Optimization Guide
+echo                    Startup Optimization Guide
 echo.
-echo     1. Autoruns will open shortly...
-echo     2. Go to the 'Logon' tab.
-echo     3. Uncheck programs you want to disable from startup.
-echo     4. BE CAREFUL: Do not disable Windows system files.
-echo     5. CLOSE the Autoruns window to finish this step.
+echo                    1. Autoruns will open shortly...
+echo                    2. Go to the 'Logon' tab.
+echo                    3. Uncheck programs you want to disable from startup.
+echo                    4. BE CAREFUL: Do not disable Windows system files.
+echo                    5. CLOSE the Autoruns window to finish this step.
 echo.
-echo     Launching Autoruns...
+echo                    Launching Autoruns...
 echo.
-echo     Waiting for user to close the Autoruns...
+echo                    Waiting for user to close the Autoruns...
 
 start /wait "" "%download_dir%\%autoruns_exe%"
 
 call :WRITE_LOG "Startup programs managed via Autoruns (user manually unchecked items)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Autoruns closed. Optimization finished.
+echo                    [SUCCESS] Autoruns closed. Optimization finished.
 echo.
-echo     Back to Main Menu...
+echo                    Back to Main Menu...
 timeout /t 3 >nul
 goto MAIN_MENU
 
@@ -1096,24 +1397,25 @@ goto MAIN_MENU
 call :PRINT_HEADER
 title Disable All Power Saving Features
 color 0F
-echo     DISABLE POWER SAVING FEATURES
+echo                    DISABLE POWER SAVING FEATURES
 echo.
-echo     [1] All-in-One
-echo     - Disables Sleep Mode, Hibernation, and Power Saving modes all at once.
+echo                    [1] All-in-One
+echo                    - Disables Sleep Mode, Hibernation, and Power Saving modes all at once.
 echo.
-echo     [2] Disable Hibernation
-echo     - Saves SSD/HDD Space, improves performance by disabling Hibernation.
+echo                    [2] Disable Hibernation
+echo                    - Saves SSD/HDD Space, improves performance by disabling Hibernation.
 echo.
-echo     [3] Disable Sleep Mode
-echo     - Prevent Windows from going to Sleep or turning off the screen.
+echo                    [3] Disable Sleep Mode
+echo                    - Prevent Windows from going to Sleep or turning off the screen.
 echo.
-echo     [4] Disable All Power Saving on Devices
-echo     - Prevent Windows from turning off USB/LAN/Wifi when idle.
+echo                    [4] Disable All Power Saving on Devices
+echo                    - Prevent Windows from turning off USB/LAN/Wifi when idle.
 echo.
-echo     [5] Revert to Default
-echo     [B] Back to Main Menu
+echo                    [5] Revert to Default
+echo                    [B] Back to Main Menu
 echo.
-set /p pwr_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p pwr_choice=""
 
 if "%pwr_choice%"=="1" goto PWR_DISABLE_ALL
 if "%pwr_choice%"=="2" goto PWR_HIBERNATE
@@ -1122,8 +1424,8 @@ if "%pwr_choice%"=="4" goto PWR_DEVICE
 if "%pwr_choice%"=="5" goto PWR_REVERT
 if /i "%pwr_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto POWER_SAVING
 
@@ -1131,19 +1433,19 @@ goto POWER_SAVING
 :PWR_DISABLE_ALL
 call :PRINT_HEADER
 color 0E
-echo     [All-in-One] Disabling all power saving features...
+echo                    [All-in-One] Disabling all power saving features...
 echo.
-echo     1. Disabling Hibernation...
+echo                    1. Disabling Hibernation...
 echo.
 powercfg -h off >nul 2>&1
 
-echo     2. Disabling Sleep Mode...
+echo                    2. Disabling Sleep Mode...
 echo.
 powercfg -x -standby-timeout-ac 0 >nul 2>&1
 powercfg -x -disk-timeout-ac 0 >nul 2>&1
 powercfg -x -monitor-timeout-ac 0 >nul 2>&1
 
-echo     3. Disabling All Power Saving on Devices...
+echo                    3. Disabling All Power Saving on Devices...
 echo.
 powershell -Command "Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi | ForEach-Object { $_.Enable = $false; $_.psbase.put() }" >nul 2>&1
 call :WRITE_LOG "All power saving features disabled"
@@ -1153,7 +1455,7 @@ goto PWR_SUCCESS
 :PWR_HIBERNATE
 call :PRINT_HEADER
 color 0E
-echo     Disabling Hibernation...
+echo                    Disabling Hibernation...
 powercfg -h off >nul 2>&1
 call :WRITE_LOG "Hibernation disabled"
 goto PWR_SUCCESS
@@ -1162,7 +1464,7 @@ goto PWR_SUCCESS
 :PWR_SLEEP
 call :PRINT_HEADER
 color 0E
-echo     Disabling Sleep Mode...
+echo                    Disabling Sleep Mode...
 powercfg -x -standby-timeout-ac 0 >nul 2>&1
 powercfg -x -disk-timeout-ac 0 >nul 2>&1
 powercfg -x -monitor-timeout-ac 0 >nul 2>&1
@@ -1173,7 +1475,7 @@ goto PWR_SUCCESS
 :PWR_DEVICE
 call :PRINT_HEADER
 color 0E
-echo     Disabling Device Power Management (USB/LAN/Wifi)...
+echo                    Disabling Device Power Management (USB/LAN/Wifi)...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance -Namespace root\wmi -ClassName MSPower_DeviceEnable | ForEach-Object { $_.Enable = $false; Set-CimInstance -CimInstance $_ }" >nul 2>&1
 call :WRITE_LOG "Device power management disabled (USB, LAN, WiFi idle power off)"
 goto PWR_SUCCESS
@@ -1182,37 +1484,37 @@ goto PWR_SUCCESS
 :PWR_REVERT
 call :PRINT_HEADER
 color 0E
-echo     Reverting Power Settings to Default...
+echo                    Reverting Power Settings to Default...
 echo.
-echo     1. Enabling Hibernation...
+echo                    1. Enabling Hibernation...
 echo.
 powercfg -h on >nul 2>&1
 
-echo     2. Setting Sleep Timer to 30 Minutes...
+echo                    2. Setting Sleep Timer to 30 Minutes...
 echo.
 powercfg -x -standby-timeout-ac 30 >nul 2>&1
 powercfg -x -disk-timeout-ac 20 >nul 2>&1
 powercfg -x -monitor-timeout-ac 10 >nul 2>&1
 
-echo     3. Enabling Device Power Management...
+echo                    3. Enabling Device Power Management...
 echo.
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance -Namespace root\wmi -ClassName MSPower_DeviceEnable | ForEach-Object { $_.Enable = $true; Set-CimInstance -CimInstance $_ }" >nul 2>&1
 
 call :WRITE_LOG "All power settings reverted to default (hibernation on, sleep timers restored, device power management enabled)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Power settings reverted to default
+echo                    [SUCCESS] Power settings reverted to default
 echo.
-echo     Back to Power Saving menu...
+echo                    Back to Power Saving menu...
 timeout /t 3 >nul
 goto POWER_SAVING
 
 :PWR_SUCCESS
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Power settings optimization Applied
+echo                    [SUCCESS] Power settings optimization Applied
 echo.
-echo     Back to Power Saving menu...
+echo                    Back to Power Saving menu...
 timeout /t 3 >nul
 goto POWER_SAVING
 
@@ -1223,20 +1525,21 @@ goto POWER_SAVING
 title System Restore Menu
 call :PRINT_HEADER
 color 0F
-echo     SYSTEM RESTORE MENU
+echo                    SYSTEM RESTORE MENU
 echo.
-echo     [1] Create Restore Point
-echo     [2] Open System Restore
-echo     [B] Back to Main Menu
+echo                    [1] Create Restore Point
+echo                    [2] Open System Restore
+echo                    [B] Back to Main Menu
 echo.
-set /p restore_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p restore_choice=""
 
 if "%restore_choice%"=="1" goto CREATE_RESTORE
 if "%restore_choice%"=="2" goto OPEN_RESTORE
 if /i "%restore_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto SYSTEM_RESTORE_MENU
 
@@ -1245,8 +1548,8 @@ title Create System Restore Point
 call :PRINT_HEADER
 color 0E
 echo.
-echo     Creating system restore point...
-echo     This may take a moment, please wait...
+echo                    Creating system restore point...
+echo                    This may take a moment, please wait...
 echo.
     
 :: This part ensures that System Restore is enabled on C: drive
@@ -1264,11 +1567,11 @@ if %errorlevel% neq 0 (
     call :WRITE_LOG "Failed to create restore point"
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] Could not create restore point.
+    echo                    [FAILED] Could not create restore point.
     echo.
-    echo     This is likely because:
-    echo     1. The System Restore service is fully disabled.
-    echo     2. Your C: drive is out of disk space.
+    echo                    This is likely because:
+    echo                    1. The System Restore service is fully disabled.
+    echo                    2. Your C: drive is out of disk space.
         
     :: Keep the cooldown rule removed even if failed
     reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v SystemRestorePointCreationFrequency /f >nul 2>&1
@@ -1286,9 +1589,9 @@ echo.
 call :PRINT_HEADER
 color 0A
 echo.
-echo     [SUCCESS] Restore point created successfully
+echo                    [SUCCESS] Restore point created successfully
 echo.
-echo     Back to System Restore menu...
+echo                    Back to System Restore menu...
 timeout /t 3 >nul
 goto SYSTEM_RESTORE_MENU
 
@@ -1297,7 +1600,7 @@ title Open System Restore
 call :PRINT_HEADER
 color 0F
 echo.
-echo     Opening System Restore...
+echo                    Opening System Restore...
 
 :: First check where rstrui.exe is located
 set "RSTRUI_PATH="
@@ -1311,37 +1614,37 @@ if not defined RSTRUI_PATH goto :RESTORE_NOT_FOUND
 call :PRINT_HEADER
 color 0E
 echo.
-echo     ───────────────────────────────────────────
-echo       WAITING FOR SYSTEM RESTORE TO CLOSED...
-echo     ───────────────────────────────────────────
+echo                    ───────────────────────────────────────
+echo                    WAITING FOR SYSTEM RESTORE TO CLOSED...
+echo                    ───────────────────────────────────────
 echo.
-echo     Launching System Restore...
+echo                    Launching System Restore...
 
 :: This /WAIT command will "lock" the script
 start "" /WAIT "%RSTRUI_PATH%"
 
 :: After the user closes rstrui.exe, the script will continue here
-color 0A
 call :PRINT_HEADER
+color 0A
 echo.
-echo     [SUCCESS] System Restore has closed.
+echo                    [SUCCESS] System Restore has closed.
 echo.
-echo     Back to System Restore menu...
+echo                    Back to System Restore menu...
 timeout /t 3 >nul
 goto SYSTEM_RESTORE_MENU
 
 :RESTORE_NOT_FOUND
 call :PRINT_HEADER
 color 0C
-echo     System Restore (rstrui.exe) not found.
-echo     Opening System Protection settings instead...
+echo                    System Restore (rstrui.exe) not found.
+echo                    Opening System Protection settings instead...
 start "" systempropertiesprotection
 echo.
-echo     ─────────────────────────────────────
-echo     Instructions:
-echo     1. Open 'System Protection' menu.
-echo     2. Click 'System Restore...' button.
-echo     ─────────────────────────────────────
+echo                    ─────────────────────────────────────
+echo                    Instructions:
+echo                    1. Open 'System Protection' menu.
+echo                    2. Click 'System Restore...' button.
+echo                    ─────────────────────────────────────
 echo.
 pause
 goto SYSTEM_RESTORE_MENU
@@ -1353,16 +1656,17 @@ goto SYSTEM_RESTORE_MENU
 title CPU Optimization
 call :PRINT_HEADER
 color 0F
-echo     CPU OPTIMIZATION (%CPU_TYPE%)
+echo                    CPU OPTIMIZATION (%CPU_TYPE%)
 echo.
-echo     [1] Applying TGP (Ultimate Performance)
-echo     [2] Set CPU and Network Priority for Gaming
-echo     [3] Revert CPU and Network Priority to Default
-if "%CPU_TYPE%"=="AMD" echo     [A] AMD CPU Boost Optimization
-echo     [R] Revert All CPU Settings to Default
-echo     [B] Back to Main Menu
+echo                    [1] Applying TGP (Ultimate Performance)
+echo                    [2] Set CPU and Network Priority for Gaming
+echo                    [3] Revert CPU and Network Priority to Default
+if "%CPU_TYPE%"=="AMD" echo                    [A] AMD CPU Boost Optimization
+echo                    [R] Revert All CPU Settings to Default
+echo                    [B] Back to Main Menu
 echo.
-set /p cpu_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p cpu_choice=""
 
 if "%cpu_choice%"=="1" goto SMART_POWER_PLAN
 if /i "%cpu_choice%"=="A" if "%CPU_TYPE%"=="AMD" goto CPU_AMD_BOOST
@@ -1371,8 +1675,8 @@ if "%cpu_choice%"=="3" goto CPU_NET_PRIORITY_OFF
 if /i "%cpu_choice%"=="R" goto CPU_REVERT
 if /i "%cpu_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto CPU_MENU
 
@@ -1382,15 +1686,15 @@ goto CPU_MENU
 :SMART_POWER_PLAN
 call :PRINT_HEADER
 color 0E
-echo     Importing TGP...
+echo                    Importing TGP...
 echo.
 
 :: check if file exists
 if not exist "C:\TGO\TGP.pow" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] TGP.pow not found in C:\TGO\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] TGP.pow not found in C:\TGO\
+    echo                    Please ensure the download was successful.
     pause
     goto CPU_MENU
 )
@@ -1404,91 +1708,91 @@ if %errorlevel%==0 (
     call :WRITE_LOG "TGP Ultimate Performance power plan activated"
     call :PRINT_HEADER
     color 0A
-    echo     ─────────────────────────────────────────────
-    echo     [SUCCESS] TGP ULTIMATE PERFORMANCE ACTIVATED!
-    echo     ─────────────────────────────────────────────
+    echo                    ─────────────────────────────────────────────
+    echo                    [SUCCESS] TGP ULTIMATE PERFORMANCE ACTIVATED!
+    echo                    ─────────────────────────────────────────────
     echo.
-    echo     Back to CPU Optimization menu...
+    echo                    Back to CPU Optimization menu...
     timeout /t 3 >nul
     goto CPU_MENU
 ) else (
     call :WRITE_LOG "High Performance power plan activated"
     call :PRINT_HEADER
     color 0C
-    echo     [WARNING] Failed to activate TGP. Trying default High Performance...
+    echo                    [WARNING] Failed to activate TGP. Trying default High Performance...
     powercfg -duplicatescheme 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
     powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
-    echo     [SUCCESS] High Performance Activated.
-    echo     Back to CPU Optimization menu...
+    echo                    [SUCCESS] High Performance Activated.
+    echo                    Back to CPU Optimization menu...
     timeout /t 3 >nul
     goto CPU_MENU
 )
 
-echo     Back to CPU Optimization menu...
+echo                    Back to CPU Optimization menu...
 timeout /t 3 >nul
 goto CPU_MENU
 
 :CPU_AMD_BOOST
 call :PRINT_HEADER
 color 0E
-echo     Applying AMD CPU Boost Optimization...
+echo                    Applying AMD CPU Boost Optimization...
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Throttle" /v "PerfEnablePackageIdle" /t REG_DWORD /d 0 /f >nul 2>&1
 call :WRITE_LOG "AMD CPU Boost optimization applied"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] AMD CPU Boost Applied.
+echo                    [SUCCESS] AMD CPU Boost Applied.
 echo.
-echo     Back to CPU menu...
+echo                    Back to CPU menu...
 timeout /t 3 >nul
 goto CPU_MENU
 
 :CPU_NET_PRIORITY_ON
 call :PRINT_HEADER
 color 0E
-echo     Applying CPU and Network Priority for Gaming...
+echo                    Applying CPU and Network Priority for Gaming...
 echo.
-echo     [1/2] Setting SystemResponsiveness to 0 (Maximum CPU priority for foreground)
+echo                    [1/2] Setting SystemResponsiveness to 0 (Maximum CPU priority for foreground)
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 0 /f >nul 2>&1
-if %errorlevel% equ 0 ( echo     [OK] ) else ( echo     [FAILED] )
+if %errorlevel% equ 0 ( echo                    [OK] ) else ( echo                    [FAILED] )
 
 echo.
-echo     [2/2] Setting NetworkThrottlingIndex to 0xffffffff (Disable network throttling)
+echo                    [2/2] Setting NetworkThrottlingIndex to 0xffffffff (Disable network throttling)
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 0xffffffff /f >nul 2>&1
-if %errorlevel% equ 0 ( echo     [OK] ) else ( echo     [FAILED] )
+if %errorlevel% equ 0 ( echo                    [OK] ) else ( echo                    [FAILED] )
 
 call :WRITE_LOG "CPU & Network priority set for gaming (SystemResponsiveness=0, NetworkThrottlingIndex=ffffffff)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] CPU and Network priority tweaks applied!
+echo                    [SUCCESS] CPU and Network priority tweaks applied!
 echo.
-echo     Note: These tweaks give maximum priority to games but may cause
-echo     background tasks (downloads, streaming) to become sluggish.
+echo                    Note: These tweaks give maximum priority to games but may cause
+echo                    background tasks (downloads, streaming) to become sluggish.
 echo.
-echo     Back to CPU Menu...
+echo                    Back to CPU Menu...
 timeout /t 5 >nul
 goto CPU_MENU
 
 :CPU_NET_PRIORITY_OFF
 call :PRINT_HEADER
 color 0E
-echo     Reverting CPU and Network Priority to Default...
+echo                    Reverting CPU and Network Priority to Default...
 echo.
-echo     [1/2] Restoring SystemResponsiveness to 20
+echo                    [1/2] Restoring SystemResponsiveness to 20
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d 20 /f >nul 2>&1
-if %errorlevel% equ 0 ( echo     [OK] ) else ( echo     [FAILED] )
+if %errorlevel% equ 0 ( echo                    [OK] ) else ( echo                    [FAILED] )
 
 echo.
-echo     [2/2] Restoring NetworkThrottlingIndex to 10
+echo                    [2/2] Restoring NetworkThrottlingIndex to 10
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 10 /f >nul 2>&1
-if %errorlevel% equ 0 ( echo     [OK] ) else ( echo     [FAILED] )
+if %errorlevel% equ 0 ( echo                    [OK] ) else ( echo                    [FAILED] )
 
 call :WRITE_LOG "CPU & Network priority reverted to default (SystemResponsiveness=20, NetworkThrottlingIndex=10)"
 
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] CPU and Network priority restored to default!
+echo                    [SUCCESS] CPU and Network priority restored to default!
 echo.
-echo     Back to CPU Menu...
+echo                    Back to CPU Menu...
 timeout /t 3 >nul
 goto CPU_MENU
 
@@ -1500,9 +1804,9 @@ if "%CPU_TYPE%"=="AMD" reg delete "HKLM\SYSTEM\CurrentControlSet\Control\Session
 call :WRITE_LOG "All CPU settings reverted to default"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] CPU Settings Reverted.
+echo                    [SUCCESS] CPU Settings Reverted.
 echo.
-echo     Back to CPU menu...
+echo                    Back to CPU menu...
 timeout /t 3 >nul
 goto CPU_MENU
 
@@ -1513,19 +1817,20 @@ goto CPU_MENU
 title GPU Optimization
 call :PRINT_HEADER
 color 0F
-echo     GPU OPTIMIZATION (%OPTIMIZE_GPU%)
+echo                    GPU OPTIMIZATION (%OPTIMIZE_GPU%)
 echo.
-echo     [1] Enable HAGS (Hardware Accelerated GPU Scheduling)
-echo     [2] Optimize Game Mode (%OS_NAME%)
-if "%OPTIMIZE_GPU%"=="NVIDIA" echo     [N] NVIDIA GPU Tweaks
-if "%OPTIMIZE_GPU%"=="AMD" echo     [A] AMD GPU Tweaks
-if "%OPTIMIZE_GPU%"=="INTEL" echo     [I] INTEL GPU Tweaks
-if "%OPTIMIZE_GPU%"=="NVIDIA" echo     [R] Revert NVIDIA GPU Settings to Default
-if "%OPTIMIZE_GPU%"=="AMD" echo     [R] Revert AMD GPU Settings to Default
-if "%OPTIMIZE_GPU%"=="INTEL" echo     [R] Revert INTEL GPU Settings to Default
-echo     [B] Back to Main Menu
+echo                    [1] Enable HAGS (Hardware Accelerated GPU Scheduling)
+echo                    [2] Optimize Game Mode (%OS_NAME%)
+if "%OPTIMIZE_GPU%"=="NVIDIA" echo                    [N] NVIDIA GPU Tweaks
+if "%OPTIMIZE_GPU%"=="AMD" echo                    [A] AMD GPU Tweaks
+if "%OPTIMIZE_GPU%"=="INTEL" echo                    [I] INTEL GPU Tweaks
+if "%OPTIMIZE_GPU%"=="NVIDIA" echo                    [R] Revert NVIDIA GPU Settings to Default
+if "%OPTIMIZE_GPU%"=="AMD" echo                    [R] Revert AMD GPU Settings to Default
+if "%OPTIMIZE_GPU%"=="INTEL" echo                    [R] Revert INTEL GPU Settings to Default
+echo                    [B] Back to Main Menu
 echo.
-set /p gpu_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p gpu_choice=""
 
 if "%gpu_choice%"=="1" goto GPU_HAGS_ON
 if "%gpu_choice%"=="2" goto GPU_GAMEMODE
@@ -1535,47 +1840,47 @@ if /i "%gpu_choice%"=="I" if "%OPTIMIZE_GPU%"=="INTEL" goto GPU_INTEL_TWEAK
 if /i "%gpu_choice%"=="R" goto GPU_REVERT
 if /i "%gpu_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto GPU_MENU
 
 :GPU_HAGS_ON
 call :PRINT_HEADER
 color 0E
-echo     Enabling HAGS...
+echo                    Enabling HAGS...
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t REG_DWORD /d 2 /f >nul 2>&1
 call :WRITE_LOG "Hardware Accelerated GPU Scheduling (HAGS) enabled"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] HAGS Enabled. Restart Required
+echo                    [SUCCESS] HAGS Enabled. Restart Required
 echo.
-echo     Back to GPU Optimization menu...
+echo                    Back to GPU Optimization menu...
 timeout /t 3 >nul
 goto GPU_MENU
 
 :GPU_GAMEMODE
 call :PRINT_HEADER
 color 0E
-echo     Optimizing Game Mode For (%OS_NAME%)...
+echo                    Optimizing Game Mode For (%OS_NAME%)...
 reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d %GAME_MODE_VALUE% /f >nul 2>&1
 reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d %GAME_MODE_VALUE% /f >nul 2>&1
 call :WRITE_LOG "Game Mode set to %GAME_MODE_TARGET% for %OS_NAME%"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Game Mode Set to %GAME_MODE_TARGET%
+echo                    [SUCCESS] Game Mode Set to %GAME_MODE_TARGET%
 echo.
-echo     Back to GPU Optimization menu...
+echo                    Back to GPU Optimization menu...
 timeout /t 3 >nul
 goto GPU_MENU
 
 :GPU_NVIDIA_TWEAK
 call :PRINT_HEADER
 color 0E
-echo     Searching for NVIDIA GPU Registry Keys...
+echo                    Searching for NVIDIA GPU Registry Keys...
 set FOUND_NVIDIA=0
 for /f "delims=" %%p in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" /s /f "NVIDIA" ^| find "HKEY"') do (
-    echo     Applying NVIDIA tweaks to: %%p
+    echo                    Applying NVIDIA tweaks to: %%p
     set FOUND_NVIDIA=1
     reg add "%%p" /v "DisableDynamicPstate" /t REG_DWORD /d 1 /f >nul 2>&1
     reg add "%%p" /v "RMHdcpKeyglobZero" /t REG_DWORD /d 1 /f >nul 2>&1
@@ -1584,10 +1889,10 @@ for /f "delims=" %%p in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class
 )
 
 if "%FOUND_NVIDIA%"=="0" (
-    echo     [INFO] No NVIDIA GPU keys found in registry.
+    echo                    [INFO] No NVIDIA GPU keys found in registry.
 ) else (
     echo.
-    echo     Apply Global NVIDIA Power Tweaks...
+    echo                    Apply Global NVIDIA Power Tweaks...
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "QosManagesIdleProcessors" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /t REG_DWORD /d 1 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /t REG_DWORD /d 0 /f >nul 2>&1
@@ -1625,22 +1930,24 @@ if "%FOUND_NVIDIA%"=="0" (
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
     reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "NvBackend" /f >nul 2>&1
-    echo     [SUCCESS] NVIDIA GPU Optimization Applied.
+    echo                    [SUCCESS] NVIDIA GPU Optimization Applied.
 )
 call :WRITE_LOG "NVIDIA GPU tweaks applied (power management, latency settings, service disabled)"
-pause
+echo.
+echo                    Press any key to continue...
+pause >nul
 goto GPU_MENU
 
 :GPU_AMD_TWEAK
 call :PRINT_HEADER
 color 0E
-echo     Searching for AMD GPU Registry Keys...
+echo                    Searching for AMD GPU Registry Keys...
 set FOUND_AMD=0
 
 for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" 2^>nul ^| find "HKEY"') do (
     reg query "%%k" /v "DriverDesc" 2>nul | findstr /i "AMD ATI Radeon" >nul
     if !errorlevel! equ 0 (
-        echo     Applying AMD Tweaks to: %%k
+        echo                    Applying AMD Tweaks to: %%k
         set FOUND_AMD=1
         reg add "%%k" /v "AsicOnLowPower" /t REG_DWORD /d 0 /f >nul 2>&1
         reg add "%%k" /v "EnableUlps" /t REG_DWORD /d 0 /f >nul 2>&1
@@ -1702,21 +2009,23 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorLatencyToleranc
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
 
-if "%FOUND_AMD%"=="0" echo     [INFO] No AMD GPU keys found.
-if "%FOUND_AMD%"=="1" echo     [SUCCESS] AMD GPU Optimization Applied.
+if "%FOUND_AMD%"=="0" echo                    [INFO] No AMD GPU keys found.
+if "%FOUND_AMD%"=="1" echo                    [SUCCESS] AMD GPU Optimization Applied.
 call :WRITE_LOG "AMD GPU tweaks applied (ULPS disabled, power management off, UMD optimizations)"
-pause
+echo.
+echo                    Press any key to continue...
+pause >nul
 goto GPU_MENU
 
 :GPU_INTEL_TWEAK
 call :PRINT_HEADER
 color 0E
-echo     Searching for INTEL GPU Registry Keys...
+echo                    Searching for INTEL GPU Registry Keys...
 set FOUND_INTEL=0
 for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" 2^>nul ^| find "HKEY"') do (
     reg query "%%k" /v "DriverDesc" 2>nul | findstr /i "Intel" >nul
     if !errorlevel! equ 0 (
-        echo     Applying INTEL Tweaks to: %%k
+        echo                    Applying INTEL Tweaks to: %%k
         set FOUND_INTEL=1
         reg add "%%k" /v "Disable_OverlayDSQualityEnhancement" /t REG_DWORD /d 1 /f >nul 2>&1
         reg add "%%k" /v "IncreaseFixedSegment" /t REG_DWORD /d 1 /f >nul 2>&1
@@ -1763,27 +2072,29 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorLatencyToleranc
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MonitorRefreshLatencyTolerance" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "TransitionLatency" /t REG_DWORD /d "1" /f >nul 2>&1
 
-if "%FOUND_INTEL%"=="0" echo     [INFO] No Intel GPU keys found.
-if "%FOUND_INTEL%"=="1" echo     [SUCCESS] Intel GPU Optimization Applied.
+if "%FOUND_INTEL%"=="0" echo                    [INFO] No Intel GPU keys found.
+if "%FOUND_INTEL%"=="1" echo                    [SUCCESS] Intel GPU Optimization Applied.
 call :WRITE_LOG "Intel GPU tweaks applied (power management, dedicated segment size, latency settings)"
-pause
+echo.
+echo                    Press any key to continue...
+pause >nul
 goto GPU_MENU
 
 :GPU_REVERT
 call :PRINT_HEADER
 color 0E
-echo     Detected GPUs: %GPU_MODEL_DETAIL%
+echo                    Detected GPUs: %GPU_MODEL_DETAIL%
 timeout /t 3 >nul
-echo     Reverting %OPTIMIZE_GPU% GPU Tweaks...
+echo                    Reverting %OPTIMIZE_GPU% GPU Tweaks...
 rem Revert HAGS
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t REG_DWORD /d 1 /f >nul 2>&1
 rem Revert Game Mode (Delete keys or set to 0)
 reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d 0 /f >nul 2>&1
 if "%OPTIMIZE_GPU%"=="NVIDIA" (
-    echo     Reverting NVIDIA Tweaks...
+    echo                    Reverting NVIDIA Tweaks...
     for /f "delims=" %%p in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" /s /f "NVIDIA" ^| find "HKEY"') do (
-        echo     Reverting tweaks on: %%p
+        echo                    Reverting tweaks on: %%p
         reg delete "%%p" /v "DisableDynamicPstate" /f >nul 2>&1
         reg delete "%%p" /v "RMHdcpKeyglobZero" /f >nul 2>&1
         reg delete "%%p" /v "PreferSystemMemoryContiguous" /f >nul 2>&1
@@ -1796,11 +2107,11 @@ if "%OPTIMIZE_GPU%"=="NVIDIA" (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 if "%OPTIMIZE_GPU%"=="AMD" (
-    echo     Reverting AMD Tweaks...
+    echo                    Reverting AMD Tweaks...
     for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" 2^>nul ^| find "HKEY"') do (
         reg query "%%k" /v "DriverDesc" 2>nul | findstr /i "AMD ATI Radeon" >nul
         if !errorlevel! equ 0 (
-            echo     Reverting tweaks on: %%k
+            echo                    Reverting tweaks on: %%k
             reg delete "%%k" /v "AsicOnLowPower" /f >nul 2>&1
             reg delete "%%k" /v "EnableUlps" /f >nul 2>&1
             reg delete "%%k" /v "PP_GPUPowerDownEnabled" /f >nul 2>&1
@@ -1830,11 +2141,11 @@ if "%OPTIMIZE_GPU%"=="AMD" (
     )
 )
 if "%OPTIMIZE_GPU%"=="INTEL" (
-    echo     Reverting Intel Tweaks...
+    echo                    Reverting Intel Tweaks...
     for /f "delims=" %%k in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" 2^>nul ^| find "HKEY"') do (
         reg query "%%k" /v "DriverDesc" 2>nul | findstr /i "Intel" >nul
         if !errorlevel! equ 0 (
-            echo     Reverting tweaks on: %%k
+            echo                    Reverting tweaks on: %%k
             reg delete "%%k" /v "Disable_OverlayDSQualityEnhancement" /f >nul 2>&1
             reg delete "%%k" /v "IncreaseFixedSegment" /f >nul 2>&1
             reg delete "%%k" /v "AdaptiveVbEnabled" /f >nul 2>&1
@@ -1852,9 +2163,9 @@ if "%OPTIMIZE_GPU%"=="INTEL" (
 call :WRITE_LOG "GPU settings reverted to default (HAGS, Game Mode, vendor-specific tweaks removed)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] GPU Settings Reverted.
+echo                    [SUCCESS] GPU Settings Reverted.
 echo.
-echo     Back to GPU Optimization menu...
+echo                    Back to GPU Optimization menu...
 timeout /t 3 >nul
 goto GPU_MENU
 
@@ -1867,64 +2178,104 @@ cls
 color 0B
 echo.
 echo.
-echo     [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
-echo     ──────────────────────────────────────────────────────────────
+echo                                [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
+echo                    ───────────────────────────────────────────────────────────────
 color 0F
 echo.
-echo     [v2.3.0]
-echo       + Added Taskbar ^& Start Menu Cleaner in additional tweaks.
+echo                    [v3.0.0]
+echo                    + Added Download Essentials Menu.
+echo                    + Changelog now spans 2 pages for better readability.
+echo                    + Added HDD and SSD Revert options in Disk Optimization.
+echo                    + Added Revert option in manual storage selection (UNKNOWN type).
+echo                    + Reorganized Main Menu order (hardware-first grouping).
+echo                    + All UI text aligned to center for a cleaner look.
 echo.
-echo     [v2.2.0]
-echo       + Added Windows Apps Debloater Menu.
-echo       + Integrated automatic and interactive bloatware removal.
-echo       + Added safe Microsoft Edge removal.
+echo                    [v2.3.0]
+echo                    + Added Taskbar ^& Start Menu Cleaner in additional tweaks.
 echo.
-echo     [v2.1.0]
-echo       + Added Services Optimization Menu.
-echo       + Updated TGP Power Plan for better performance. (redownload all the resources first)
+echo                    [v2.2.0]
+echo                    + Added Windows Apps Debloater Menu.
+echo                    + Integrated automatic and interactive bloatware removal.
+echo                    + Added safe Microsoft Edge removal.
 echo.
-echo     [v2.0.1]
-echo       + Fixed Storage Type Detection for some models.
+echo                    [v2.1.0]
+echo                    + Added Services Optimization Menu.
+echo                    + Updated TGP Power Plan for better performance.
 echo.
-echo     [v2.0.0]
-echo       + Completely redesigned clean and modern UI.
-echo       + Auto-detect RAM size and Storage type. (SSD/HDD)
-echo       + Improved hardware detection accuracy.
-echo       + Optimization logging system. (C:\TGO\logs\TGO_Log.txt)
-echo       + Better organized menus with clear recommendations.
-echo       + Premium visual experience with consistent styling.
-echo       + And much more...
+echo                    [v2.0.1]
+echo                    + Fixed Storage Type Detection for some models.
 echo.
-echo     [v1.5.6]
-echo       + Added Redownload All Resources Menu.
-echo       + Improved Download Reliability.
+echo                    ──────────────────────────────────────────────────────────────
+echo                                               Page 1/2
 echo.
-echo     [v1.5.5]
-echo       + Added Additional Tweaks Menu.
-echo       + Updated GPU Optimization with more tweaks.
-echo       + Updated Clean All Temporary Files.
-echo       + Fixed Hardware Detection for more models.
+echo                    [N] Next Page  ^|  [B] Back to Main Menu
 echo.
-echo     [v1.4.1]
-echo       + Fixed AMD GPU Detection for some models.
-echo.
-echo     [v1.4.0]
-echo       + Added Hardware Detection (OS, CPU, GPU)
-echo       + Added CPU Optimization Menu.
-echo       + Added GPU Optimization Menu.
-echo.
-echo     [v1.0.1]
-echo       + Added a startup safety check.
-echo       + Minor fixes and stability improvements.
-echo.
-echo     [v1.0.0]
-echo       + Initial Release of Tech Gameplay Optimizer (TGO)
-echo.
-echo     ──────────────────────────────────────────────────────────────
-echo.
-echo Press any key to continue...
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p cl_choice=""
+if /i "%cl_choice%"=="N" goto CHANGELOG_PAGE2
+if /i "%cl_choice%"=="B" goto MAIN_MENU
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
-goto MAIN_MENU
+goto CHANGELOG
+
+:CHANGELOG_PAGE2
+title Changelog - Page 2
+cls
+color 0B
+echo.
+echo.
+echo                                [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
+echo                    ───────────────────────────────────────────────────────────────
+color 0F
+echo.
+echo                    [v2.0.0]
+echo                    + Completely redesigned clean and modern UI.
+echo                    + Auto-detect RAM size and Storage type. (SSD/HDD)
+echo                    + Improved hardware detection accuracy.
+echo                    + Optimization logging system. (C:\TGO\logs\TGO_Log.txt)
+echo                    + Better organized menus with clear recommendations.
+echo                    + Premium visual experience with consistent styling.
+echo                    + And much more...
+echo.
+echo                    [v1.5.6]
+echo                    + Added Redownload All Resources Menu.
+echo                    + Improved Download Reliability.
+echo.
+echo                    [v1.5.5]
+echo                    + Added Additional Tweaks Menu.
+echo                    + Updated GPU Optimization with more tweaks.
+echo                    + Updated Clean All Temporary Files.
+echo                    + Fixed Hardware Detection for more models.
+echo.
+echo                    [v1.4.1]
+echo                    + Fixed AMD GPU Detection for some models.
+echo.
+echo                    [v1.4.0]
+echo                    + Added Hardware Detection (OS, CPU, GPU)
+echo                    + Added CPU Optimization Menu.
+echo                    + Added GPU Optimization Menu.
+echo.
+echo                    [v1.0.1]
+echo                    + Added a startup safety check.
+echo                    + Minor fixes and stability improvements.
+echo.
+echo                    [v1.0.0]
+echo                    + Initial Release of Tech Gameplay Optimizer (TGO)
+echo.
+echo                    ──────────────────────────────────────────────────────────────
+echo                                               Page 2/2
+echo.
+echo                    [P] Previous Page  ^|  [B] Back to Main Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p cl2_choice=""
+if /i "%cl2_choice%"=="P" goto CHANGELOG
+if /i "%cl2_choice%"=="B" goto MAIN_MENU
+echo                    Invalid selection
+echo                    Press any key to continue...
+pause >nul
+goto CHANGELOG_PAGE2
 
 :: ============================================================================
 :: ADDITIONAL TWEAKS
@@ -1933,18 +2284,19 @@ goto MAIN_MENU
 title Additional Tweaks
 call :PRINT_HEADER
 color 0F
-echo     ADDITIONAL TWEAKS
+echo                    ADDITIONAL TWEAKS
 echo.
-echo     [1] Turn on or off Windows Update
-echo     [2] Turn off Windows Security (Permanently)
-echo     [3] Turn off all Windows Animations
-echo     [4] Delete all useless apps via third-party tool
-echo     [5] Turn on or off User Account Control
-echo     [6] Turn on or off Transparency Effects and Color on Title Bars
-echo     [7] Taskbar ^& Start Menu Cleaner
-echo     [B] Back to Main Menu
+echo                    [1] Turn on or off Windows Update
+echo                    [2] Turn off Windows Security (Permanently)
+echo                    [3] Turn off all Windows Animations
+echo                    [4] Delete all useless apps via third-party tool
+echo                    [5] Turn on or off User Account Control
+echo                    [6] Turn on or off Transparency Effects and Color on Title Bars
+echo                    [7] Taskbar ^& Start Menu Cleaner
+echo                    [B] Back to Main Menu
 echo.
-set /p add_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p add_choice=""
 
 if "%add_choice%"=="1" goto WINDOWS_UPDATE
 if "%add_choice%"=="2" goto WINDOWS_SECURITY
@@ -1955,16 +2307,16 @@ if "%add_choice%"=="6" goto VISUAL_EFFECTS_MENU
 if "%add_choice%"=="7" goto TASKBAR_START_CLEANER
 if /i "%add_choice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto ADDITIONAL_TWEAKS
 
 :TASKBAR_START_CLEANER
 call :PRINT_HEADER
 color 0E
-echo     Cleaning Taskbar and Start Menu...
-echo     Please wait, Explorer will be restarted.
+echo                    Cleaning Taskbar and Start Menu...
+echo                    Please wait, Explorer will be restarted.
 echo.
 
 :: 1. Hide Copilot
@@ -1999,28 +2351,28 @@ start explorer.exe
 call :WRITE_LOG "Cleaned Taskbar & Start Menu Pins"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Taskbar and Start Menu have been cleaned. Returning to menu...
+echo                    [SUCCESS] Taskbar and Start Menu have been cleaned. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :ADVANCED_SYSTEM_SETTINGS
 call :PRINT_HEADER
 color 0E
-echo     Follow this step to disable all the animations
+echo                    Follow this step to disable all the animations
 echo.
-echo     1. Performance Options window will be open shortly...
-echo     2. Choose 'Adjust for best performance'.
-echo     3. Check the box 'Show thumbnails instead of icons', 'Smooth edges of screen fonts',
-echo     and 'Show window contents while dragging'.
-echo     4. After that, click 'Apply' and then 'OK' to save the settings.
-echo     5. CLOSE the Performance Options window to finish this step.
+echo                    1. Performance Options window will be open shortly...
+echo                    2. Choose 'Adjust for best performance'.
+echo                    3. Check the box 'Show thumbnails instead of icons', and
+echo                    'Smooth edges of screen fonts'.
+echo                    4. After that, click 'Apply' and then 'OK' to save the settings.
+echo                    5. CLOSE the Performance Options window to finish this step.
 echo.
 
 start /wait "" %windir%\System32\SystemPropertiesPerformance.exe
 call :WRITE_LOG "Adjusted visual effects for best performance (user modified Performance Options)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Performance Options window closed. Returning to menu...
+echo                    [SUCCESS] Performance Options window closed. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
@@ -2028,42 +2380,42 @@ goto ADDITIONAL_TWEAKS
 cls
 color 0E
 echo.
-echo     Downloading all the resources... (Completely Safe)
+echo                    Downloading all the resources... (Completely Safe)
 echo.
 
 if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Windows Security Permanent"
 if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
 if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
 
-echo     [1/9] Downloading.
+echo                    [1/9] Downloading.
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
 echo.
-echo     [2/9] Downloading..
+echo                    [2/9] Downloading..
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
 echo.
-echo     [3/9] Downloading...
+echo                    [3/9] Downloading...
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
 echo.
-echo     [4/9] Downloading....
+echo                    [4/9] Downloading....
 curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
 echo.
-echo     [5/9] Downloading.....
+echo                    [5/9] Downloading.....
 curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
 echo.
-echo     [6/9] Downloading......
+echo                    [6/9] Downloading......
 curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
 echo.
-echo     [7/9] Downloading.......
+echo                    [7/9] Downloading.......
 curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
 echo.
-echo     [8/9] Downloading........
+echo                    [8/9] Downloading........
 curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
 echo.
-echo     [9/9] Downloading.........
+echo                    [9/9] Downloading.........
 curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
 
 echo.
-echo     All resources downloaded successfully.
+echo                    All resources downloaded successfully.
 timeout /t 3 >nul
 cls
 goto STARTUP_RESTORE_CHECK
@@ -2072,61 +2424,62 @@ goto STARTUP_RESTORE_CHECK
 title Redownload Resources
 call :PRINT_HEADER
 color 0E
-echo     Redownloading all the resources... (Completely Safe)
+echo                    Redownloading all the resources... (Completely Safe)
 echo.
 
 if not exist "C:\TGO\Disable Windows Security Permanent" md "C:\TGO\Disable Windows Security Permanent"
 if not exist "C:\TGO\UAC Off" md "C:\TGO\UAC Off"
 if not exist "C:\TGO\UAC On" md "C:\TGO\UAC On"
 
-echo     [1/9] Downloading.
+echo                    [1/9] Downloading.
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.bat" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/off.bat" >nul 2>&1  
 echo.
-echo     [2/9] Downloading..
+echo                    [2/9] Downloading..
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\off.reg" "https://raw.githubusercontent.com/tehgeii/TGOResources/main/Disable%%20Windows%%20Security%%20Permanent/off.reg" >nul 2>&1  
 echo.
-echo     [3/9] Downloading...
+echo                    [3/9] Downloading...
 curl -g -k -L -# -o "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" "https://raw.githubusercontent.com/tehgeii/TGOResources/refs/heads/main/Disable%%20Windows%%20Security%%20Permanent/PowerRun.exe" >nul 2>&1  
 echo.
-echo     [4/9] Downloading....
+echo                    [4/9] Downloading....
 curl -g -k -L -# -o "C:\TGO\UAC Off\off.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20Off/off.bat" >nul 2>&1  
 echo.
-echo     [5/9] Downloading.....
+echo                    [5/9] Downloading.....
 curl -g -k -L -# -o "C:\TGO\UAC On\on without black screen.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on%%20without%%20black%%20screen.bat" >nul 2>&1  
 echo.
-echo     [6/9] Downloading......
+echo                    [6/9] Downloading......
 curl -g -k -L -# -o "C:\TGO\UAC On\on.bat" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/UAC%%20On/on.bat" >nul 2>&1  
 echo.
-echo     [7/9] Downloading.......
+echo                    [7/9] Downloading.......
 curl -g -k -L -# -o "C:\TGO\geek.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/geek.exe" >nul 2>&1  
 echo.
-echo     [8/9] Downloading........
+echo                    [8/9] Downloading........
 curl -g -k -L -# -o "C:\TGO\TGP.pow" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/TGP.pow" >nul 2>&1  
 echo.
-echo     [9/9] Downloading.........
+echo                    [9/9] Downloading.........
 curl -g -k -L -# -o "C:\TGO\Wub_x64.exe" "https://github.com/tehgeii/TGOResources/raw/refs/heads/main/Wub_x64.exe" >nul 2>&1  
 
 echo.
-echo     All resources downloaded successfully.
+echo                    All resources downloaded successfully.
 timeout /t 3 >nul
 goto MAIN_MENU
 
 :WINDOWS_UPDATE
 call :PRINT_HEADER
 color 0E
-echo     Windows Update Blocker Guide
+echo                    Windows Update Blocker Guide
 echo.
-echo     1. Choose 'Disable Updates' (with the option checked) to turn off Windows Update.
-echo     2. Choose 'Enable Updates' to turn on Windows Update.
-echo     3. Then hit 'Apply Now' button to save the settings.
-echo     4. CLOSE the WUB window to finish this step.
+echo                    1. Choose 'Disable Updates' (with the option checked)
+echo                    to turn off Windows Update.
+echo                    2. Choose 'Enable Updates' to turn on Windows Update.
+echo                    3. Then hit 'Apply Now' button to save the settings.
+echo                    4. CLOSE the WUB window to finish this step.
 echo.
 :: check if file exists
 if not exist "C:\TGO\Wub_x64.exe" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] Wub_x64.exe not found in C:\TGO\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] Wub_x64.exe not found in C:\TGO\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2135,21 +2488,21 @@ start /wait "" "C:\TGO\Wub_x64.exe"
 call :WRITE_LOG "Windows Update settings changed via WUB (Windows Update Blocker)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Windows Update Blocker closed. Returning to menu...
+echo                    [SUCCESS] Windows Update Blocker closed. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :WINDOWS_SECURITY
 call :PRINT_HEADER
 color 0E
-echo     Waiting for all the processes related to Windows Security to be completed...
+echo                    Waiting for all the processes related to Windows Security to be completed...
 echo.
 
 if not exist "C:\TGO\Disable Windows Security Permanent\PowerRun.exe" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] PowerRun.exe not found in C:\TGO\Disable Windows Security Permanent\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] PowerRun.exe not found in C:\TGO\Disable Windows Security Permanent\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2165,26 +2518,27 @@ powershell -Command "Start-Process -FilePath '%PWR_EXE%' -ArgumentList 'regedit.
 call :WRITE_LOG "Windows Security permanently disabled via PowerRun and registry"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] Windows Security has been turned off permanently. Returning to menu...
+echo                    [SUCCESS] Windows Security has been turned off permanently. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :DELETE_APPS
 call :PRINT_HEADER
 color 0E
-echo     Delete Apps Guide
+echo                    Delete Apps Guide
 echo.
-echo     1. geek will be launched shortly...
-echo     2. Inside geek, select the apps you want to delete.
-echo     3. After selecting, right click on the selected apps and choose 'Uninstall'.
-echo     4. After the uninstallation is done, CLOSE geek to finish this step.
+echo                    1. geek will be launched shortly...
+echo                    2. Inside geek, select the apps you want to delete.
+echo                    3. After selecting, right click on the selected apps
+echo                    and choose 'Uninstall'.
+echo                    4. After the uninstallation is done, CLOSE geek to finish this step.
 echo.
 :: check if file exists
 if not exist "C:\TGO\geek.exe" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] geek not found in C:\TGO\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] geek not found in C:\TGO\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2193,25 +2547,26 @@ start /wait "" "C:\TGO\geek.exe"
 call :WRITE_LOG "Uninstalled applications using geek (user removed selected apps)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] geek has been closed. Returning to menu...
+echo                    [SUCCESS] geek has been closed. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :UAC
 call :PRINT_HEADER
 color 0F
-echo     Do you want to turn on or off User Account Control (UAC)?
+echo                    Do you want to turn on or off User Account Control (UAC)?
 echo.
-echo     [1] Turn ON UAC
-echo     [2] Turn OFF UAC
+echo                    [1] Turn ON UAC
+echo                    [2] Turn OFF UAC
 echo.
-set /p uac_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p uac_choice=""
 
 if "%uac_choice%"=="1" goto UAC_ON
 if "%uac_choice%"=="2" goto UAC_OFF
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto UAC
 echo.
@@ -2220,8 +2575,8 @@ echo.
 if not exist "C:\TGO\UAC Off\off.bat" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] off.bat not found in C:\TGO\UAC Off\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] off.bat not found in C:\TGO\UAC Off\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2230,7 +2585,7 @@ start /wait "" "C:\TGO\UAC Off\off.bat"
 call :WRITE_LOG "User Account Control (UAC) turned OFF"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] UAC has been turned off. Returning to menu...
+echo                    [SUCCESS] UAC has been turned off. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
@@ -2238,8 +2593,8 @@ goto ADDITIONAL_TWEAKS
 if not exist "C:\TGO\UAC On\on.bat" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] on.bat not found in C:\TGO\UAC On\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] on.bat not found in C:\TGO\UAC On\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2248,18 +2603,19 @@ start /wait "" "C:\TGO\UAC On\on.bat"
 :UACF
 call :PRINT_HEADER
 color 0F
-echo     Do you want to remove the black screen when turning on UAC?
+echo                    Do you want to remove the black screen when turning on UAC?
 echo.
-echo     [1] Yes
-echo     [2] No
+echo                    [1] Yes
+echo                    [2] No
 echo.
-set /p uacf_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p uacf_choice=""
 
 if "%uacf_choice%"=="1" goto UACF_ON
 if "%uacf_choice%"=="2" goto UACF_OFF
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto UACF
 
@@ -2267,8 +2623,8 @@ goto UACF
 if not exist "C:\TGO\UAC On\on without black screen.bat" (
     call :PRINT_HEADER
     color 0C
-    echo     [FAILED] on without black screen.bat not found in C:\TGO\UAC On\
-    echo     Please ensure the download was successful.
+    echo                    [FAILED] on without black screen.bat not found in C:\TGO\UAC On\
+    echo                    Please ensure the download was successful.
     pause
     goto ADDITIONAL_TWEAKS
 )
@@ -2276,29 +2632,30 @@ start /wait "" "C:\TGO\UAC On\on without black screen.bat"
 call :WRITE_LOG "User Account Control (UAC) turned ON (without black screen)"
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] UAC has been turned on. Returning to menu...
+echo                    [SUCCESS] UAC has been turned on. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :UACF_OFF
 call :PRINT_HEADER
 color 0A
-echo     [SUCCESS] UAC has been turned on. Returning to menu...
+echo                    [SUCCESS] UAC has been turned on. Returning to menu...
 timeout /t 3 >nul
 goto ADDITIONAL_TWEAKS
 
 :VISUAL_EFFECTS_MENU
 call :PRINT_HEADER
 color 0F
-echo     VISUAL EFFECTS SETTINGS
+echo                    VISUAL EFFECTS SETTINGS
 echo.
-echo     [1] Turn ON Transparency Effects
-echo     [2] Turn OFF Transparency Effects
-echo     [3] Turn ON Color on Title Bars
-echo     [4] Turn OFF Color on Title Bars
-echo     [B] Back to Additional Tweaks
+echo                    [1] Turn ON Transparency Effects
+echo                    [2] Turn OFF Transparency Effects
+echo                    [3] Turn ON Color on Title Bars
+echo                    [4] Turn OFF Color on Title Bars
+echo                    [B] Back to Additional Tweaks
 echo.
-set /p visual_choice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p visual_choice=""
 
 if "%visual_choice%"=="1" goto TURN_ON_TRANSPARENCY
 if "%visual_choice%"=="2" goto TURN_OFF_TRANSPARENCY
@@ -2306,25 +2663,25 @@ if "%visual_choice%"=="3" goto TURN_ON_TITLEBAR_COLOR
 if "%visual_choice%"=="4" goto TURN_OFF_TITLEBAR_COLOR
 if /i "%visual_choice%"=="B" goto ADDITIONAL_TWEAKS
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto VISUAL_EFFECTS_MENU
 
 :TURN_ON_TRANSPARENCY
 call :PRINT_HEADER
 color 0E
-echo     Enabling Transparency Effects...
+echo                    Enabling Transparency Effects...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d 1 /f >nul 2>&1
 if %errorlevel% equ 0 (
     call :WRITE_LOG "Transparency Effects has been turned ON"
     call :PRINT_HEADER
     color 0A
-    echo     [SUCCESS] Transparency Effects turned ON. Returning to menu...
+    echo                    [SUCCESS] Transparency Effects turned ON. Returning to menu...
 ) else (
     call :PRINT_HEADER
     color 0C
-    echo     [ERROR] Failed to modify registry. Returning to menu...
+    echo                    [ERROR] Failed to modify registry. Returning to menu...
 )
 timeout /t 3 >nul
 goto VISUAL_EFFECTS_MENU
@@ -2332,17 +2689,17 @@ goto VISUAL_EFFECTS_MENU
 :TURN_OFF_TRANSPARENCY
 call :PRINT_HEADER
 color 0E
-echo     Disabling Transparency Effects...
+echo                    Disabling Transparency Effects...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d 0 /f >nul 2>&1
 if %errorlevel% equ 0 (
     call :WRITE_LOG "Transparency Effects has been turned OFF"
     call :PRINT_HEADER
     color 0A
-    echo     [SUCCESS] Transparency Effects turned OFF. Returning to menu...
+    echo                    [SUCCESS] Transparency Effects turned OFF. Returning to menu...
 ) else (
     call :PRINT_HEADER
     color 0C
-    echo     [ERROR] Failed to modify registry. Returning to menu...
+    echo                    [ERROR] Failed to modify registry. Returning to menu...
 )
 timeout /t 3 >nul
 goto VISUAL_EFFECTS_MENU
@@ -2350,17 +2707,17 @@ goto VISUAL_EFFECTS_MENU
 :TURN_ON_TITLEBAR_COLOR
 call :PRINT_HEADER
 color 0E
-echo     Enabling Color on Title Bars...
+echo                    Enabling Color on Title Bars...
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "ColorPrevalence" /t REG_DWORD /d 1 /f >nul 2>&1
 if %errorlevel% equ 0 (
     call :WRITE_LOG "Color on Title Bars has been turned ON"
     call :PRINT_HEADER
     color 0A
-    echo     [SUCCESS] Color on title bars turned ON. A restart may be required.
+    echo                    [SUCCESS] Color on title bars turned ON. A restart may be required.
 ) else (
     call :PRINT_HEADER
     color 0C
-    echo     [ERROR] Failed to modify registry. Returning to menu...
+    echo                    [ERROR] Failed to modify registry. Returning to menu...
 )
 timeout /t 3 >nul
 goto VISUAL_EFFECTS_MENU
@@ -2368,17 +2725,17 @@ goto VISUAL_EFFECTS_MENU
 :TURN_OFF_TITLEBAR_COLOR
 call :PRINT_HEADER
 color 0E
-echo     Disabling Color on Title Bars...
+echo                    Disabling Color on Title Bars...
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "ColorPrevalence" /t REG_DWORD /d 0 /f >nul 2>&1
 if %errorlevel% equ 0 (
     call :WRITE_LOG "Color on Title Bars has been turned OFF"
     call :PRINT_HEADER
     color 0A
-    echo     [SUCCESS] Color on title bars turned OFF. A restart may be required.
+    echo                    [SUCCESS] Color on title bars turned OFF. A restart may be required.
 ) else (
     call :PRINT_HEADER
     color 0C
-    echo     [ERROR] Failed to modify registry. Returning to menu...
+    echo                    [ERROR] Failed to modify registry. Returning to menu...
 )
 timeout /t 3 >nul
 goto VISUAL_EFFECTS_MENU
@@ -2390,17 +2747,18 @@ goto VISUAL_EFFECTS_MENU
 title Services Optimization
 call :PRINT_HEADER
 color 0F
-echo     SERVICES OPTIMIZATION
+echo                    SERVICES OPTIMIZATION
 echo.
-echo     [1]  Basic Optimization     (Safe for everyone)
-echo     [2]  Standard Optimization  (Recommended for gamers)
-echo     [3]  Advanced Optimization  (Extreme Tweaks - Read Info first)
-echo     [4]  Revert to Default
+echo                    [1]  Basic Optimization     (Safe for everyone)
+echo                    [2]  Standard Optimization  (Recommended for gamers)
+echo                    [3]  Advanced Optimization  (Extreme Tweaks - Read Info first)
+echo                    [4]  Revert to Default
 echo.
-echo     [I]  Mode Info ^& Explanation
-echo     [B]  Back to Main Menu
+echo                    [I]  Mode Info ^& Explanation
+echo                    [B]  Back to Main Menu
 echo.
-set /p svcchoice="Select option: "
+powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
+set /p svcchoice=""
 
 if "%svcchoice%"=="1" goto SERVICES_BASIC
 if "%svcchoice%"=="2" goto SERVICES_STANDARD
@@ -2409,49 +2767,49 @@ if "%svcchoice%"=="4" goto SERVICES_REVERT
 if /i "%svcchoice%"=="I" goto SERVICES_INFO
 if /i "%svcchoice%"=="B" goto MAIN_MENU
 
-echo Invalid selection
-echo Press any key to continue...
+echo                    Invalid selection
+echo                    Press any key to continue...
 pause >nul
 goto SERVICES_OPTIMIZATION_MENU
 
 :SERVICES_INFO
 call :PRINT_HEADER
 color 0F
-echo     MODE INFO ^& EXPLANATION SERVICES OPTIMIZATION
+echo                    MODE INFO ^& EXPLANATION SERVICES OPTIMIZATION
 echo.
-echo     Basic Mode: (Safe for everyone)
-echo     - Disables Telemetry, Tracking, and Microsoft Diagnostics.
-echo     - Disables Bloatware services (RetailDemo, WAP Push).
-echo     - Useful for reducing background processes without damaging important features.
+echo                    Basic Mode: (Safe for everyone)
+echo                    - Disables Telemetry, Tracking, and Microsoft Diagnostics.
+echo                    - Disables Bloatware services (RetailDemo, WAP Push).
+echo                    - Useful for reducing background processes without damaging important features.
 echo.
-echo     Standard Mode: (Recommended for gamers)
-echo     - Includes all Basic Mode features.
-echo     - Disables rarely used services: Print Spooler (printer), Offline 
-echo       Files, Remote Registry, and Superfetch (highly recommended if 
-echo       using SSD).
-echo     - Disables Windows Notifications (Toast/Push) and Messaging.
-echo     - Info: If you need to print or see notifications, use Revert mode later.
+echo                    Standard Mode: (Recommended for gamers)
+echo                    - Includes all Basic Mode features.
+echo                    - Disables rarely used services: Print Spooler (printer), Offline 
+echo                    Files, Remote Registry, and Superfetch (highly recommended if 
+echo                    using SSD).
+echo                    - Disables Windows Notifications (Toast/Push) and Messaging.
+echo                    - Info: If you need to print or see notifications, use Revert mode later.
 echo.
-echo     Advanced Mode: (EXTREME - Use at your own risk)
-echo     - Includes all Standard Mode features.
-echo     - Disables Windows Update, Windows Defender (Security), Xbox Services,
-echo       and several other services.
-echo     - Info: NOT RECOMMENDED for daily use because it is very vulnerable
-echo       to viruses and cannot install games from Microsoft Store/Xbox.
+echo                    Advanced Mode: (EXTREME - Use at your own risk)
+echo                    - Includes all Standard Mode features.
+echo                    - Disables Windows Update, Windows Defender (Security), Xbox Services,
+echo                    and several other services.
+echo                    - Info: NOT RECOMMENDED for daily use because it is very vulnerable
+echo                    to viruses and cannot install games from Microsoft Store/Xbox.
 echo.
-echo     Revert to Default:
-echo     - Restore all disabled services to their original Windows settings.
-echo     - Use this if any features suddenly stop working.
+echo                    Revert to Default:
+echo                    - Restore all disabled services to their original Windows settings.
+echo                    - Use this if any features suddenly stop working.
 echo.
-echo     Press any key to go back...
+echo                    Press any key to go back...
 pause >nul
 goto SERVICES_OPTIMIZATION_MENU
 
 :SERVICES_BASIC
 call :PRINT_HEADER
 color 0E
-echo     Applying Basic Services Optimization...
-echo     Please wait...
+echo                    Applying Basic Services Optimization...
+echo                    Please wait...
 echo.
 sc stop DoSvc > nul 2>&1
 sc config DoSvc start= disabled > nul 2>&1
@@ -2474,15 +2832,15 @@ sc config DiagTrack start= disabled > nul 2>&1
 
 call :WRITE_LOG "Applied Basic Services Optimization"
 color 0A
-echo     [SUCCESS] Basic Optimization Applied!
+echo                    [SUCCESS] Basic Optimization Applied!
 timeout /t 3 >nul
 goto SERVICES_OPTIMIZATION_MENU
 
 :SERVICES_STANDARD
 call :PRINT_HEADER
 color 0E
-echo     Applying Standard Services Optimization...
-echo     Please wait...
+echo                    Applying Standard Services Optimization...
+echo                    Please wait...
 echo.
 :: Apply Basic first
 sc stop DoSvc > nul 2>&1
@@ -2537,16 +2895,16 @@ reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BcastDVRUserServic
 
 call :WRITE_LOG "Applied Standard Services Optimization"
 color 0A
-echo     [SUCCESS] Standard Optimization Applied!
+echo                    [SUCCESS] Standard Optimization Applied!
 timeout /t 3 >nul
 goto SERVICES_OPTIMIZATION_MENU
 
 :SERVICES_ADVANCED
 call :PRINT_HEADER
 color 0C
-echo     [WARNING] Applying Advanced Services Optimization...
-echo     This will disable Windows Update and Windows Defender!
-echo     Please wait...
+echo                    [WARNING] Applying Advanced Services Optimization...
+echo                    This will disable Windows Update and Windows Defender!
+echo                    Please wait...
 echo.
 :: Apply Standard first
 sc stop DoSvc > nul 2>&1
@@ -2640,15 +2998,15 @@ reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UnistoreSvc" /v St
 
 call :WRITE_LOG "Applied Advanced Services Optimization"
 color 0A
-echo     [SUCCESS] Advanced Optimization Applied!
+echo                    [SUCCESS] Advanced Optimization Applied!
 timeout /t 3 >nul
 goto SERVICES_OPTIMIZATION_MENU
 
 :SERVICES_REVERT
 call :PRINT_HEADER
 color 0E
-echo     Reverting Services to Default...
-echo     Please wait...
+echo                    Reverting Services to Default...
+echo                    Please wait...
 echo.
 sc config DoSvc start= delayed-auto > nul 2>&1
 sc config diagsvc start= demand > nul 2>&1
@@ -2704,7 +3062,7 @@ reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UnistoreSvc" /v St
 
 call :WRITE_LOG "Reverted Services Optimization to Default"
 color 0A
-echo     [SUCCESS] Services Reverted to Default!
+echo                    [SUCCESS] Services Reverted to Default!
 timeout /t 3 >nul
 goto SERVICES_OPTIMIZATION_MENU
 
@@ -2728,7 +3086,7 @@ for /f "tokens=1,2 delims=:" %%G in ("%_pair%") do (
 )
 :PROMPT_REMOVE
 set "rm="
-<nul set /p "=.%BS%    Delete %_name%? (Y/N): "
+<nul set /p "=.%BS%                   Delete %_name%? (Y/N): "
 set /p "rm="
 if /i "%rm%"=="N" goto :eof
 if /i "%rm%"=="Y" goto DO_REMOVE
@@ -2737,7 +3095,7 @@ if /i "%rm%"=="Y" goto DO_REMOVE
 goto PROMPT_REMOVE
 
 :DO_REMOVE
-echo     Removing %_name%...
+echo                    Removing %_name%...
 PowerShell -NoProfile -Command "Get-AppxPackage -allusers *%_pkg%* | Remove-AppxPackage -ErrorAction SilentlyContinue" >nul 2>&1
 goto :eof
 
@@ -2750,7 +3108,7 @@ for /f "tokens=1,2 delims=:" %%G in ("%_pair%") do (
 )
 :PROMPT_RESTORE
 set "rm="
-<nul set /p "=.%BS%    Restore %_name%? (Y/N): "
+<nul set /p "=.%BS%                   Restore %_name%? (Y/N): "
 set /p "rm="
 if /i "%rm%"=="N" goto :eof
 if /i "%rm%"=="Y" goto DO_RESTORE
@@ -2759,6 +3117,6 @@ if /i "%rm%"=="Y" goto DO_RESTORE
 goto PROMPT_RESTORE
 
 :DO_RESTORE
-echo     Restoring %_name%...
+echo                    Restoring %_name%...
 PowerShell -NoProfile -Command "Get-AppxPackage -AllUsers *%_pkg%* | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register \"$($_.InstallLocation)\AppXManifest.xml\"}" >nul 2>&1
 goto :eof
