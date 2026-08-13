@@ -2,7 +2,7 @@
 
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Downloads)](https://github.com/tehgeii/TGO/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
-[![Version](https://img.shields.io/badge/Version-2.3.0-blue.svg)](https://github.com/tehgeii/TGO/releases/latest)
+[![Version](https://img.shields.io/badge/Version-3.0.0-blue.svg)](https://github.com/tehgeii/TGO/releases/latest)
 [![Support me on Sociabuzz](https://img.shields.io/badge/Support%20me%20on-Sociabuzz-ffdd00?logo=sociabuzz&logoColor=black)](https://sociabuzz.com/tgo)
 
 <img width="500" alt="TGO Main Menu" src="https://github.com/user-attachments/assets/e67222df-8a0e-41fd-8aa2-298c45044cf1" />
@@ -40,7 +40,7 @@ TGO is a small Windows batch tool that applies simple tweaks to make Windows fee
 
 ### Is this a virus?
 - Short answer: **No.** - this is an open batch script that edits system settings. It's not an installer or obfuscated binary.
-- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/e634a723de3efa9473672e7afd6b6b6facc6e7907353c541f63ca5c063390777
+- However, because it changes the registry and services, some antivirus engines may flag it as suspicious. Check the VirusTotal report here: https://www.virustotal.com/gui/file/0745e6950cc4eccc63a3321c7b0f672cb0fc1724d3ee344d605f4808b79bc131
 
 ### Before Using TGO
 - The script includes revert options for some areas and a System Restore creator, but some changes may require a reboot or manual undo.
