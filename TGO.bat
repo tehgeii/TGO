@@ -224,7 +224,7 @@ echo                                        ██║   ╚██████╔
 echo                                        ╚═╝    ╚═════╝  ╚═════╝ 
 echo.
 color 0F
-echo                                    Tech Gameplay Optimizer  v3.0.0
+echo                                    Tech Gameplay Optimizer  v3.1.0
 echo                    ───────────────────────────────────────────────────────────────
 echo                    •  OS: %OS_NAME%
 echo                    •  CPU: %CPU_MODEL%
@@ -237,7 +237,7 @@ goto :eof
 
 :MAIN_MENU
 call :PRINT_HEADER
-title TGO v3.0.0
+title TGO v3.1.0
 color 0F
 echo                                               MAIN MENU
 echo.
@@ -519,12 +519,29 @@ color 0F
 echo                    DOWNLOAD ESSENTIALS
 echo.
 echo                    [1]  Browsers (Chrome, Firefox, Brave, etc.)
+echo                    [2]  Compression (7-Zip, WinRAR)
+echo                    [3]  Games (Steam, Epic Games)
+echo                    [4]  Messaging (Discord, Zoom)
+echo                    [5]  Media (VLC, Spotify, etc.)
+echo                    [6]  Imaging (ShareX, ImageGlass, etc.)
+echo                    [7]  Utilities (Revo, Geek Uninstaller, etc.)
+echo                    [8]  Developer Tools (VS Code, Notepad++)
+echo                    [9]  Online Storage (Google Drive)
+echo.
 echo                    [B]  Back to Main Menu
 echo.
 powershell -NoProfile -Command "[Console]::Write('                   Select option: ')"
 set /p de_choice=""
 
 if "%de_choice%"=="1" goto DE_BROWSERS
+if "%de_choice%"=="2" goto DE_COMPRESSION
+if "%de_choice%"=="3" goto DE_GAMES
+if "%de_choice%"=="4" goto DE_MESSAGING
+if "%de_choice%"=="5" goto DE_MEDIA
+if "%de_choice%"=="6" goto DE_IMAGING
+if "%de_choice%"=="7" goto DE_UTILITIES
+if "%de_choice%"=="8" goto DE_DEVTOOLS
+if "%de_choice%"=="9" goto DE_STORAGE
 if /i "%de_choice%"=="B" goto MAIN_MENU
 
 echo                    Invalid selection
@@ -582,7 +599,7 @@ color 0A
 echo.
 echo                    [SUCCESS] Selected browsers have been installed.
 echo.
-echo                    Returning to Download Essentials menu...
+echo                    Returning to menu...
 timeout /t 3 >nul
 goto DE_BROWSERS
 
@@ -635,53 +652,800 @@ goto :eof
 :INSTALL_BRAVE
 color 0E
 echo.
-echo                    Downloading Brave...
-powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/brave/brave-browser/releases/latest'; $url = ($r.assets | Where-Object { $_.name -eq 'BraveBrowserStandaloneSilentSetup.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\BraveSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
-if exist "%TEMP%\BraveSetup.exe" (
-    echo                    Installing Brave...
-    start /wait "" "%TEMP%\BraveSetup.exe"
-    for /L %%I in (1,1,30) do (
-        if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
-        if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
-        if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
-        timeout /t 1 >nul
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing Brave via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent Brave.Brave' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading Brave...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/brave/brave-browser/releases/latest'; $url = ($r.assets | Where-Object { $_.name -eq 'BraveBrowserStandaloneSilentSetup.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\BraveSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\BraveSetup.exe" (
+        echo                    Installing Brave...
+        start /wait "" "%TEMP%\BraveSetup.exe"
+        del /f /q "%TEMP%\BraveSetup.exe" >nul 2>&1
     )
-    :BRAVE_DONE
-    del /f /q "%TEMP%\BraveSetup.exe" >nul 2>&1
-    echo                    Launching Brave...
-    if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
-    if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe"
-    if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe"
 )
+for /L %%I in (1,1,30) do (
+    if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+    if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+    if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" goto BRAVE_DONE
+    timeout /t 1 >nul
+)
+:BRAVE_DONE
+echo                    Launching Brave...
+if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+if exist "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe"
+if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" start "" "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe"
 goto :eof
 
 :INSTALL_VIVALDI
 color 0E
 echo.
-echo                    Downloading Vivaldi...
-powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://vivaldi.com/download/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'vivaldi\..*x64\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\VivaldiSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
-if exist "%TEMP%\VivaldiSetup.exe" (
-    echo                    Installing Vivaldi...
-    start /wait "" "%TEMP%\VivaldiSetup.exe" --vivaldi-silent --do-not-launch-chrome
-    del /f /q "%TEMP%\VivaldiSetup.exe" >nul 2>&1
-    echo                    Launching Vivaldi...
-    if exist "C:\Program Files\Vivaldi\Application\vivaldi.exe" start "" "C:\Program Files\Vivaldi\Application\vivaldi.exe"
-    if exist "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe" start "" "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe"
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing Vivaldi via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent Vivaldi.Vivaldi' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading Vivaldi...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://vivaldi.com/download/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'vivaldi\..*x64\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\VivaldiSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\VivaldiSetup.exe" (
+        echo                    Installing Vivaldi...
+        start /wait "" "%TEMP%\VivaldiSetup.exe" --vivaldi-silent --do-not-launch-chrome
+        del /f /q "%TEMP%\VivaldiSetup.exe" >nul 2>&1
+    )
 )
+echo                    Launching Vivaldi...
+if exist "C:\Program Files\Vivaldi\Application\vivaldi.exe" start "" "C:\Program Files\Vivaldi\Application\vivaldi.exe"
+if exist "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe" start "" "%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe"
 goto :eof
 
 
 :INSTALL_LIBREWOLF
 color 0E
 echo.
-echo                    Downloading LibreWolf...
-powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://librewolf.net/installation/windows/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'librewolf-.*windows-x86_64-setup\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\LibreWolfSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
-if exist "%TEMP%\LibreWolfSetup.exe" (
-    echo                    Installing LibreWolf...
-    start /wait "" "%TEMP%\LibreWolfSetup.exe" /S
-    del /f /q "%TEMP%\LibreWolfSetup.exe" >nul 2>&1
-    echo                    Launching LibreWolf...
-    if exist "C:\Program Files\LibreWolf\librewolf.exe" start "" "C:\Program Files\LibreWolf\librewolf.exe"
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing LibreWolf via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent LibreWolf.LibreWolf' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading LibreWolf...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://librewolf.net/installation/windows/' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'librewolf-.*windows-x86_64-setup\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\LibreWolfSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\LibreWolfSetup.exe" (
+        echo                    Installing LibreWolf...
+        start /wait "" "%TEMP%\LibreWolfSetup.exe" /S
+        del /f /q "%TEMP%\LibreWolfSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching LibreWolf...
+if exist "C:\Program Files\LibreWolf\librewolf.exe" start "" "C:\Program Files\LibreWolf\librewolf.exe"
+goto :eof
+
+:DE_COMPRESSION
+call :PRINT_HEADER
+color 0F
+echo                    SELECT COMPRESSION APPS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] 7-Zip                  [2] WinRAR
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_comp_choice=""
+
+if /i "%de_comp_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_comp_choice%"=="ALL" set "de_comp_choice=1 2"
+
+set "valid_selection=0"
+for %%A in (%de_comp_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_COMPRESSION
+)
+
+for %%A in (%de_comp_choice%) do (
+    if "%%A"=="1" call :INSTALL_7ZIP
+    if "%%A"=="2" call :INSTALL_WINRAR
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_COMPRESSION
+
+:INSTALL_7ZIP
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing 7-Zip via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent 7zip.7zip' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading 7-Zip...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://www.7-zip.org/download.html' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'a/7z.*-x64\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { $fullUrl = 'https://www.7-zip.org/' + $url; Invoke-WebRequest -Uri $fullUrl -OutFile '%TEMP%\7ZipSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\7ZipSetup.exe" (
+        echo                    Installing 7-Zip...
+        start /wait "" "%TEMP%\7ZipSetup.exe" /S
+        del /f /q "%TEMP%\7ZipSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching 7-Zip...
+if exist "C:\Program Files\7-Zip\7zFM.exe" start "" "C:\Program Files\7-Zip\7zFM.exe"
+goto :eof
+
+:INSTALL_WINRAR
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing WinRAR via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent RARLab.WinRAR' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading WinRAR...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://www.rarlab.com/download.htm' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'rar/winrar-x64-.*\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url) { $fullUrl = 'https://www.rarlab.com/' + $url; Invoke-WebRequest -Uri $fullUrl -OutFile '%TEMP%\WinRARSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\WinRARSetup.exe" (
+        echo                    Installing WinRAR...
+        start /wait "" "%TEMP%\WinRARSetup.exe" /S
+        del /f /q "%TEMP%\WinRARSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching WinRAR...
+if exist "C:\Program Files\WinRAR\WinRAR.exe" start "" "C:\Program Files\WinRAR\WinRAR.exe"
+goto :eof
+
+:DE_GAMES
+call :PRINT_HEADER
+color 0F
+echo                    SELECT GAME LAUNCHERS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] Steam                  [2] Epic Games
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_games_choice=""
+
+if /i "%de_games_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_games_choice%"=="ALL" set "de_games_choice=1 2"
+
+set "valid_selection=0"
+for %%A in (%de_games_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_GAMES
+)
+
+for %%A in (%de_games_choice%) do (
+    if "%%A"=="1" call :INSTALL_STEAM
+    if "%%A"=="2" call :INSTALL_EPIC
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_GAMES
+
+:INSTALL_STEAM
+color 0E
+echo.
+echo                    Downloading Steam...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://cdn.cloudflare.steamstatic.com/client/installer/SteamSetup.exe' -OutFile '%TEMP%\SteamSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\SteamSetup.exe" (
+    echo                    Installing Steam...
+    start /wait "" "%TEMP%\SteamSetup.exe" /S
+    del /f /q "%TEMP%\SteamSetup.exe" >nul 2>&1
+    echo                    Launching Steam...
+    if exist "C:\Program Files (x86)\Steam\steam.exe" start "" "C:\Program Files (x86)\Steam\steam.exe"
+)
+goto :eof
+
+:INSTALL_EPIC
+color 0E
+echo.
+echo                    Downloading Epic Games Launcher...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi' -OutFile '%TEMP%\EpicSetup.msi' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\EpicSetup.msi" (
+    echo                    Installing Epic Games Launcher...
+    msiexec /i "%TEMP%\EpicSetup.msi" /qn /norestart
+    del /f /q "%TEMP%\EpicSetup.msi" >nul 2>&1
+    echo                    Launching Epic Games Launcher...
+    if exist "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe" start "" "C:\Program Files (x86)\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe"
+    if exist "C:\Program Files\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe" start "" "C:\Program Files\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe"
+)
+goto :eof
+
+:DE_MESSAGING
+call :PRINT_HEADER
+color 0F
+echo                    SELECT MESSAGING APPS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] Discord                [2] Zoom
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_msg_choice=""
+
+if /i "%de_msg_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_msg_choice%"=="ALL" set "de_msg_choice=1 2"
+
+set "valid_selection=0"
+for %%A in (%de_msg_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_MESSAGING
+)
+
+for %%A in (%de_msg_choice%) do (
+    if "%%A"=="1" call :INSTALL_DISCORD
+    if "%%A"=="2" call :INSTALL_ZOOM
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_MESSAGING
+
+:INSTALL_DISCORD
+color 0E
+echo.
+echo                    Downloading Discord...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://discord.com/api/downloads/distributions/app/installers/latest?channel=stable&platform=win&arch=x86' -OutFile '%TEMP%\DiscordSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\DiscordSetup.exe" (
+    echo                    Installing Discord...
+    explorer.exe "%TEMP%\DiscordSetup.exe"
+)
+goto :eof
+
+:INSTALL_ZOOM
+color 0E
+echo.
+echo                    Downloading Zoom...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://zoom.us/client/latest/ZoomInstallerFull.exe?archType=x64' -OutFile '%TEMP%\ZoomSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\ZoomSetup.exe" (
+    echo                    Installing Zoom...
+    start /wait "" "%TEMP%\ZoomSetup.exe" /silent
+    del /f /q "%TEMP%\ZoomSetup.exe" >nul 2>&1
+    echo                    Launching Zoom...
+    if exist "%APPDATA%\Zoom\bin\Zoom.exe" start "" "%APPDATA%\Zoom\bin\Zoom.exe"
+    if exist "C:\Program Files\Zoom\bin\Zoom.exe" start "" "C:\Program Files\Zoom\bin\Zoom.exe"
+    if exist "C:\Program Files (x86)\Zoom\bin\Zoom.exe" start "" "C:\Program Files (x86)\Zoom\bin\Zoom.exe"
+)
+goto :eof
+
+:DE_MEDIA
+call :PRINT_HEADER
+color 0F
+echo                    SELECT MEDIA APPS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 3", or type "ALL" for all of them!)
+echo.
+echo                    [1] VLC                    [3] MPC-HC
+echo                    [2] Winamp                 [4] Spotify
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_media_choice=""
+
+if /i "%de_media_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_media_choice%"=="ALL" set "de_media_choice=1 2 3 4"
+
+set "valid_selection=0"
+for %%A in (%de_media_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+    if "%%A"=="3" set "valid_selection=1"
+    if "%%A"=="4" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_MEDIA
+)
+
+for %%A in (%de_media_choice%) do (
+    if "%%A"=="1" call :INSTALL_VLC
+    if "%%A"=="2" call :INSTALL_WINAMP
+    if "%%A"=="3" call :INSTALL_MPCHC
+    if "%%A"=="4" call :INSTALL_SPOTIFY
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_MEDIA
+
+:INSTALL_VLC
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing VLC via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent VideoLAN.VLC' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading VLC...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-RestMethod -Uri 'https://get.videolan.org/vlc/last/win64/'; $file = ($html | Select-String -Pattern 'vlc-[\d\.]+-win64\.exe' -AllMatches).Matches.Value | Select-Object -First 1; if ($file) { Invoke-WebRequest -Uri ('https://get.videolan.org/vlc/last/win64/' + $file) -OutFile '%TEMP%\VLCSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\VLCSetup.exe" (
+        echo                    Installing VLC...
+        start /wait "" "%TEMP%\VLCSetup.exe" /S
+        del /f /q "%TEMP%\VLCSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching VLC...
+if exist "C:\Program Files\VideoLAN\VLC\vlc.exe" start "" "C:\Program Files\VideoLAN\VLC\vlc.exe"
+goto :eof
+
+:INSTALL_WINAMP
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing Winamp via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent Winamp.Winamp' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading Winamp...
+    powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.nullsoft.com/winamp/client/winamp592_3490_rc4_full_en-us.exe' -OutFile '%TEMP%\WinampSetup.exe' -UseBasicParsing" >nul 2>&1
+    if exist "%TEMP%\WinampSetup.exe" (
+        echo                    Installing Winamp...
+        start /wait "" "%TEMP%\WinampSetup.exe" /S
+        del /f /q "%TEMP%\WinampSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching Winamp...
+if exist "C:\Program Files (x86)\Winamp\winamp.exe" start "" "C:\Program Files (x86)\Winamp\winamp.exe"
+goto :eof
+
+:INSTALL_MPCHC
+color 0E
+echo.
+echo                    Downloading MPC-HC...
+powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/clsid2/mpc-hc/releases/latest'; $url = ($r.assets | Where-Object { $_.name -like 'MPC-HC.*.x64.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\MPCHCSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+if exist "%TEMP%\MPCHCSetup.exe" (
+    echo                    Installing MPC-HC...
+    start /wait "" "%TEMP%\MPCHCSetup.exe" /VERYSILENT
+    del /f /q "%TEMP%\MPCHCSetup.exe" >nul 2>&1
+    echo                    Launching MPC-HC...
+    if exist "C:\Program Files\MPC-HC\mpc-hc64.exe" start "" "C:\Program Files\MPC-HC\mpc-hc64.exe"
+)
+goto :eof
+
+:INSTALL_SPOTIFY
+color 0E
+echo.
+    echo                    Downloading Spotify...
+    powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.scdn.co/SpotifySetup.exe' -OutFile '%TEMP%\SpotifySetup.exe' -UseBasicParsing" >nul 2>&1
+    if exist "%TEMP%\SpotifySetup.exe" (
+        echo                    Installing Spotify...
+        explorer.exe "%TEMP%\SpotifySetup.exe"
+    )
+goto :eof
+
+:DE_IMAGING
+call :PRINT_HEADER
+color 0F
+echo                    SELECT IMAGING APPS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] ShareX                 [3] ImageGlass
+echo                    [2] Lightshot              [4] Blender
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_img_choice=""
+
+if /i "%de_img_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_img_choice%"=="ALL" set "de_img_choice=1 2 3 4"
+
+set "valid_selection=0"
+for %%A in (%de_img_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+    if "%%A"=="3" set "valid_selection=1"
+    if "%%A"=="4" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_IMAGING
+)
+
+for %%A in (%de_img_choice%) do (
+    if "%%A"=="1" call :INSTALL_SHAREX
+    if "%%A"=="2" call :INSTALL_LIGHTSHOT
+    if "%%A"=="3" call :INSTALL_IMAGEGLASS
+    if "%%A"=="4" call :INSTALL_BLENDER
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_IMAGING
+
+:INSTALL_SHAREX
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing ShareX via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent ShareX.ShareX' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading ShareX...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/ShareX/ShareX/releases/latest'; $url = ($r.assets | Where-Object { $_.name -like 'ShareX-*-setup.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\ShareXSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\ShareXSetup.exe" (
+        echo                    Installing ShareX...
+        start /wait "" "%TEMP%\ShareXSetup.exe" /VERYSILENT
+        del /f /q "%TEMP%\ShareXSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching ShareX...
+if exist "C:\Program Files\ShareX\ShareX.exe" start "" "C:\Program Files\ShareX\ShareX.exe"
+goto :eof
+
+:INSTALL_LIGHTSHOT
+color 0E
+echo.
+echo                    Downloading Lightshot...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://app.prntscr.com/build/setup-lightshot.exe' -OutFile '%TEMP%\LightshotSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\LightshotSetup.exe" (
+    echo                    Installing Lightshot...
+    start /wait "" "%TEMP%\LightshotSetup.exe" /VERYSILENT
+    del /f /q "%TEMP%\LightshotSetup.exe" >nul 2>&1
+    echo                    Launching Lightshot...
+    if exist "C:\Program Files (x86)\Skillbrains\lightshot\Lightshot.exe" start "" "C:\Program Files (x86)\Skillbrains\lightshot\Lightshot.exe"
+)
+goto :eof
+
+:INSTALL_IMAGEGLASS
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing ImageGlass via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent DuongDieuPhap.ImageGlass' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading ImageGlass...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/d2phap/ImageGlass/releases/latest'; $url = ($r.assets | Where-Object { $_.name -like '*_x64.msi' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\ImageGlassSetup.msi' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\ImageGlassSetup.msi" (
+        echo                    Installing ImageGlass...
+        msiexec /i "%TEMP%\ImageGlassSetup.msi" /qn /norestart
+        del /f /q "%TEMP%\ImageGlassSetup.msi" >nul 2>&1
+    )
+)
+echo                    Launching ImageGlass...
+if exist "C:\Program Files\ImageGlass\ImageGlass.exe" start "" "C:\Program Files\ImageGlass\ImageGlass.exe"
+goto :eof
+
+:INSTALL_BLENDER
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing Blender via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent BlenderFoundation.Blender' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading Blender...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = (Invoke-WebRequest -Uri 'https://www.blender.org/download/' -UseBasicParsing).Content; $url = ($html | Select-String -Pattern 'https://[a-zA-Z0-9\.\-/_]+blender-[\d\.]+-windows-x64\.msi' -AllMatches).Matches.Value | Select-Object -First 1; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\BlenderSetup.msi' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\BlenderSetup.msi" (
+        echo                    Installing Blender...
+        msiexec /i "%TEMP%\BlenderSetup.msi" /qn /norestart
+        del /f /q "%TEMP%\BlenderSetup.msi" >nul 2>&1
+    )
+)
+echo                    Launching Blender...
+for /d %%D in ("C:\Program Files\Blender Foundation\*") do (
+    if exist "%%D\blender.exe" (
+        start "" "%%D\blender.exe"
+        goto :eof
+    )
+)
+goto :eof
+
+:DE_UTILITIES
+call :PRINT_HEADER
+color 0F
+echo                    SELECT UTILITIES TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 3", or type "ALL" for all of them!)
+echo.
+echo                    [1] Revo Uninstaller       [3] TeamViewer
+echo                    [2] Geek Uninstaller       [4] UltraViewer
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_util_choice=""
+
+if /i "%de_util_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_util_choice%"=="ALL" set "de_util_choice=1 2 3 4"
+
+set "valid_selection=0"
+for %%A in (%de_util_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+    if "%%A"=="3" set "valid_selection=1"
+    if "%%A"=="4" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_UTILITIES
+)
+
+for %%A in (%de_util_choice%) do (
+    if "%%A"=="1" call :INSTALL_REVO
+    if "%%A"=="2" call :INSTALL_GEEK
+    if "%%A"=="3" call :INSTALL_TEAMVIEWER
+    if "%%A"=="4" call :INSTALL_ULTRAVIEWER
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_UTILITIES
+
+:INSTALL_REVO
+color 0E
+echo.
+echo                    Downloading Revo Uninstaller...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://www.revouninstaller.com/download-freeware-version.php' -OutFile '%TEMP%\RevoSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\RevoSetup.exe" (
+    echo                    Installing Revo Uninstaller...
+    start /wait "" "%TEMP%\RevoSetup.exe" /VERYSILENT
+    del /f /q "%TEMP%\RevoSetup.exe" >nul 2>&1
+    echo                    Launching Revo Uninstaller...
+    if exist "C:\Program Files\VS Revo Group\Revo Uninstaller\RevoUnin.exe" start "" "C:\Program Files\VS Revo Group\Revo Uninstaller\RevoUnin.exe"
+)
+goto :eof
+
+:INSTALL_GEEK
+color 0E
+echo.
+echo                    Downloading Geek Uninstaller...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://geekuninstaller.com/geek.zip' -OutFile '%TEMP%\geek.zip' -UseBasicParsing; Expand-Archive -Path '%TEMP%\geek.zip' -DestinationPath 'C:\Program Files\Geek Uninstaller' -Force; $wshell = New-Object -ComObject WScript.Shell; $shortcut = $wshell.CreateShortcut(\"$env:USERPROFILE\Desktop\Geek Uninstaller.lnk\"); $shortcut.TargetPath = \"C:\Program Files\Geek Uninstaller\geek.exe\"; $shortcut.Save()" >nul 2>&1
+if exist "C:\Program Files\Geek Uninstaller\geek.exe" (
+    echo                    Geek Uninstaller extracted and shortcut created!
+    del /f /q "%TEMP%\geek.zip" >nul 2>&1
+    echo                    Launching Geek Uninstaller...
+    start "" "C:\Program Files\Geek Uninstaller\geek.exe"
+)
+goto :eof
+
+:INSTALL_TEAMVIEWER
+color 0E
+echo.
+echo                    Downloading TeamViewer...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://download.teamviewer.com/download/TeamViewer_Setup_x64.exe' -OutFile '%TEMP%\TeamViewerSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\TeamViewerSetup.exe" (
+    echo                    Installing TeamViewer...
+    start /wait "" "%TEMP%\TeamViewerSetup.exe" /S
+    del /f /q "%TEMP%\TeamViewerSetup.exe" >nul 2>&1
+    echo                    Launching TeamViewer...
+    if exist "C:\Program Files\TeamViewer\TeamViewer.exe" start "" "C:\Program Files\TeamViewer\TeamViewer.exe"
+)
+goto :eof
+
+:INSTALL_ULTRAVIEWER
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing UltraViewer via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent DucFabulous.UltraViewer' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading UltraViewer...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $html = Invoke-WebRequest -Uri 'https://ultraviewer.net/en/download.html' -UseBasicParsing; $url = ($html.Links | Where-Object { $_.href -match 'UltraViewer_Setup_.*\.exe$' } | Select-Object -ExpandProperty href -First 1); if ($url -notmatch '^http') { $url = 'https://ultraviewer.net/en/' + $url }; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\UltraViewerSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\UltraViewerSetup.exe" (
+        echo                    Installing UltraViewer...
+        start /wait "" "%TEMP%\UltraViewerSetup.exe" /VERYSILENT
+        del /f /q "%TEMP%\UltraViewerSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching UltraViewer...
+if exist "C:\Program Files (x86)\UltraViewer\UltraViewer_Desktop.exe" start "" "C:\Program Files (x86)\UltraViewer\UltraViewer_Desktop.exe"
+goto :eof
+
+:DE_DEVTOOLS
+call :PRINT_HEADER
+color 0F
+echo                    SELECT DEVELOPER TOOLS TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] Visual Studio Code     [2] Notepad++
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_dev_choice=""
+
+if /i "%de_dev_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_dev_choice%"=="ALL" set "de_dev_choice=1 2"
+
+set "valid_selection=0"
+for %%A in (%de_dev_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_DEVTOOLS
+)
+
+for %%A in (%de_dev_choice%) do (
+    if "%%A"=="1" call :INSTALL_VSCODE
+    if "%%A"=="2" call :INSTALL_NPP
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_DEVTOOLS
+
+:INSTALL_VSCODE
+color 0E
+echo.
+echo                    Downloading Visual Studio Code...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user' -OutFile '%TEMP%\VSCodeSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\VSCodeSetup.exe" (
+    echo                    Installing Visual Studio Code...
+    start /wait "" "%TEMP%\VSCodeSetup.exe" /VERYSILENT /MERGETASKS=!runcode
+    del /f /q "%TEMP%\VSCodeSetup.exe" >nul 2>&1
+    echo                    Launching Visual Studio Code...
+    if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe" start "" "%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe"
+)
+goto :eof
+
+:INSTALL_NPP
+color 0E
+echo.
+winget --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo                    Installing Notepad++ via winget...
+    powershell -NoProfile -Command "Start-Process winget -WindowStyle Hidden -ArgumentList 'install --force --accept-source-agreements --accept-package-agreements --silent Notepad++.Notepad++' -Wait" >nul 2>&1
+) else (
+    echo                    Downloading Notepad++...
+    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; try { $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/notepad-plus-plus/notepad-plus-plus/releases/latest'; $url = ($r.assets | Where-Object { $_.name -like 'npp.*.Installer.x64.exe' } | Select-Object -First 1).browser_download_url; if ($url) { Invoke-WebRequest -Uri $url -OutFile '%TEMP%\NPPSetup.exe' -UseBasicParsing } } catch { }" >nul 2>&1
+    if exist "%TEMP%\NPPSetup.exe" (
+        echo                    Installing Notepad++...
+        start /wait "" "%TEMP%\NPPSetup.exe" /S
+        del /f /q "%TEMP%\NPPSetup.exe" >nul 2>&1
+    )
+)
+echo                    Launching Notepad++...
+if exist "C:\Program Files\Notepad++\notepad++.exe" start "" "C:\Program Files\Notepad++\notepad++.exe"
+goto :eof
+
+:DE_STORAGE
+call :PRINT_HEADER
+color 0F
+echo                    SELECT ONLINE STORAGE TO INSTALL
+echo                    (You can pick just 1, or pick multiple by typing their numbers
+echo                    separated by a space e.g. "1 2", or type "ALL" for all of them!)
+echo.
+echo                    [1] Google Drive           [2] Dropbox
+echo.
+echo                    [B] Back to Download Essentials Menu
+echo.
+powershell -NoProfile -Command "[Console]::Write('                   Select apps: ')"
+set /p de_storage_choice=""
+
+if /i "%de_storage_choice%"=="B" goto DOWNLOAD_ESSENTIALS_MENU
+if /i "%de_storage_choice%"=="ALL" set "de_storage_choice=1 2"
+
+set "valid_selection=0"
+for %%A in (%de_storage_choice%) do (
+    if "%%A"=="1" set "valid_selection=1"
+    if "%%A"=="2" set "valid_selection=1"
+)
+
+if "%valid_selection%"=="0" (
+    echo.
+    echo                    Invalid selection
+    echo                    Press any key to continue...
+    pause >nul
+    goto DE_STORAGE
+)
+
+for %%A in (%de_storage_choice%) do (
+    if "%%A"=="1" call :INSTALL_GDRIVE
+    if "%%A"=="2" call :INSTALL_DROPBOX
+)
+call :PRINT_HEADER
+color 0A
+echo.
+echo                    [SUCCESS] Selected apps have been installed.
+echo.
+echo                    Returning to menu...
+timeout /t 3 >nul
+goto DE_STORAGE
+
+:INSTALL_GDRIVE
+color 0E
+echo.
+echo                    Downloading Google Drive...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://dl.google.com/drive-file-stream/GoogleDriveSetup.exe' -OutFile '%TEMP%\GoogleDriveSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\GoogleDriveSetup.exe" (
+    echo                    Installing Google Drive...
+    start /wait "" "%TEMP%\GoogleDriveSetup.exe" --silent --desktop_shortcut
+    del /f /q "%TEMP%\GoogleDriveSetup.exe" >nul 2>&1
+    echo                    Launching Google Drive...
+    if exist "C:\Program Files\Google\Drive File Stream\launch.bat" start "" "C:\Program Files\Google\Drive File Stream\launch.bat"
+    if exist "C:\Program Files\Google\Drive File Stream\googledrive.exe" start "" "C:\Program Files\Google\Drive File Stream\googledrive.exe"
+)
+goto :eof
+
+:INSTALL_DROPBOX
+color 0E
+echo.
+echo                    Downloading Dropbox...
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/download?plat=win' -OutFile '%TEMP%\DropboxSetup.exe' -UseBasicParsing" >nul 2>&1
+if exist "%TEMP%\DropboxSetup.exe" (
+    echo                    Installing Dropbox...
+    start /wait "" "%TEMP%\DropboxSetup.exe" /S
+    del /f /q "%TEMP%\DropboxSetup.exe" >nul 2>&1
 )
 goto :eof
 
@@ -2181,6 +2945,13 @@ echo.
 echo                                [ TECH GAMEPLAY OPTIMIZER - CHANGELOG ]
 echo                    ───────────────────────────────────────────────────────────────
 color 0F
+echo.
+echo                    [v3.1.0]
+echo                    + Made Download Essentials fully Evergreen ^& robust.
+echo                    + Integrated winget as primary installer for all apps.
+echo                    + Improved direct download fallback logic.
+echo                    + Fixed User-Level app installation paths (Discord, Spotify).
+echo                    + Enhanced web scraping safety ^& proxy handling.
 echo.
 echo                    [v3.0.0]
 echo                    + Added Download Essentials Menu.
