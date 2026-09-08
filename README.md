@@ -1,4 +1,4 @@
-# TGO - Tech Gameplay Optimizer
+# TGO - Tech Gameplay Optimizer (outdated version, click [**here**](https://tgopremium.my.id/) to get the **latest version** from the official website)
 
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Downloads)](https://github.com/tehgeii/TGO/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
