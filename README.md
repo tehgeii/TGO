@@ -3,7 +3,7 @@
 [![Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/total?color=green&label=Downloads)](https://github.com/tehgeii/TGO/releases)
 [![Latest Release Downloads](https://img.shields.io/github/downloads/tehgeii/TGO/latest/total?color=green&label=Downloads@Latest)](https://github.com/tehgeii/TGO/releases/latest)
 [![Version](https://img.shields.io/badge/Version-3.1.0-blue.svg)](https://github.com/tehgeii/TGO/releases/latest)
-[![Support me on Sociabuzz](https://img.shields.io/badge/Support%20me%20on-Sociabuzz-ffdd00?logo=sociabuzz&logoColor=black)](https://sociabuzz.com/tgo)
+[![Support me on Click Here](https://img.shields.io/badge/Support%20me%20on-Click%20Here-ffdd00?logo=sociabuzz&logoColor=black)](https://tgopremium.my.id/)
 
 <img width="819" alt="TGO Main Menu" src="https://github.com/user-attachments/assets/fa080c5b-f6d6-44e4-92db-b73fa6dfca36" />
 
